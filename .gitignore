@@ -23,7 +23,7 @@ Homestead.json
 Homestead.yaml
 Thumbs.db
 ./PythonCamConnect/.venv
-./PythonCamConnect/.env
 ./PythonCamConnect/__pycache__
 ./PythonCamConnect/storage/recordings/*
 ./PythonCamConnect/storage/thumbnails/*
+./PythonCamConnect/.git
