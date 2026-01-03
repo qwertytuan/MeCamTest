@@ -140,6 +140,14 @@ def init_camera():
         # Generate unique stream ID
         stream_id = str(uuid.uuid4())
 
+        # Alert settings from request
+        alert_enabled = data.get('alert_enabled', False)
+        alert_email = data.get('alert_email')
+        alert_api_username = data.get('alert_api_username')
+        alert_api_password = data.get('alert_api_password')
+        camera_name = data.get('camera_name', f"Camera {camera_id}")
+        camera_location = data.get('camera_location', 'Unknown')
+
         # Create detection pipeline if detection is enabled
         detection_pipeline = None
         if detection_type.upper() != 'NONE':
@@ -150,7 +158,14 @@ def init_camera():
                 sensitivity=detection_sensitivity,
                 recording_duration=recording_duration,
                 fps=int(camera_info.get('frame_rate', 30)),
-                resolution=(camera_info.get('width', 640), camera_info.get('height', 480))
+                resolution=(camera_info.get('width', 640), camera_info.get('height', 480)),
+                # Alert settings
+                alert_enabled=alert_enabled,
+                alert_email=alert_email,
+                alert_api_username=alert_api_username,
+                alert_api_password=alert_api_password,
+                camera_name=camera_name,
+                camera_location=camera_location
             )
 
         # Create pipeline
@@ -178,7 +193,7 @@ def init_camera():
         capture_thread.start()
         CAMERA_PIPELINES[stream_id]['thread'] = capture_thread
 
-        print(f"[API] Camera initialized: {stream_id} -> {camera_connection_path} (ID: {camera_id}, Detection: {detection_type})")
+        print(f"[API] Camera initialized: {stream_id} -> {camera_connection_path} (ID: {camera_id}, Detection: {detection_type}, Alert: {alert_enabled})")
 
         return jsonify({
             'success': True,
@@ -186,7 +201,8 @@ def init_camera():
             'websocket_url': f"/stream/{stream_id}",
             'camera_info': camera_info,
             'detection_enabled': detection_type.upper() != 'NONE',
-            'detection_type': detection_type.upper()
+            'detection_type': detection_type.upper(),
+            'alert_enabled': alert_enabled
         }), 201
 
     except Exception as e:
@@ -369,7 +385,90 @@ def update_detection_settings(stream_id):
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
-# 9. API Endpoint to get detection status
+# 9. API Endpoint to update alert settings
+@app.route('/api/camera/alert/<stream_id>', methods=['POST'])
+def update_alert_settings(stream_id):
+    """
+    Update alert settings for a camera stream.
+
+    Request body (JSON):
+    {
+        "alert_email": "user@example.com",
+        "alert_api_username": "username",
+        "alert_api_password": "password",
+        "alert_enabled": true,
+        "camera_name": "Front Door Camera",
+        "camera_location": "Entrance"
+    }
+    """
+    if stream_id not in CAMERA_PIPELINES:
+        return jsonify({'success': False, 'error': 'Stream not found'}), 404
+
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'success': False, 'error': 'No JSON data provided'}), 400
+
+        pipeline = CAMERA_PIPELINES[stream_id]
+        detection_pipeline = pipeline.get('detection_pipeline')
+
+        if not detection_pipeline:
+            return jsonify({'success': False, 'error': 'Detection not enabled for this camera'}), 400
+
+        # Update alert settings
+        detection_pipeline.update_alert_settings(
+            alert_email=data.get('alert_email'),
+            alert_api_username=data.get('alert_api_username'),
+            alert_api_password=data.get('alert_api_password'),
+            alert_enabled=data.get('alert_enabled'),
+            camera_name=data.get('camera_name'),
+            camera_location=data.get('camera_location')
+        )
+
+        return jsonify({
+            'success': True,
+            'message': 'Alert settings updated',
+            'alert_status': detection_pipeline.email_alert.get_status()
+        })
+
+    except Exception as e:
+        print(f"[API] Error updating alert settings: {e}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# 10. API Endpoint to get alert status
+@app.route('/api/camera/alert/<stream_id>/status', methods=['GET'])
+def get_alert_status(stream_id):
+    """
+    Get alert status for a camera stream.
+    """
+    if stream_id not in CAMERA_PIPELINES:
+        return jsonify({'success': False, 'error': 'Stream not found'}), 404
+
+    try:
+        pipeline = CAMERA_PIPELINES[stream_id]
+        detection_pipeline = pipeline.get('detection_pipeline')
+
+        if detection_pipeline:
+            return jsonify({
+                'success': True,
+                'alert_status': detection_pipeline.email_alert.get_status(),
+                'alert_history': detection_pipeline.email_alert.get_alert_history(10)
+            })
+        else:
+            return jsonify({
+                'success': True,
+                'alert_status': {
+                    'alert_enabled': False,
+                    'is_configured': False
+                }
+            })
+
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+
+# 11. API Endpoint to get detection status
 @app.route('/api/camera/detection/<stream_id>/status', methods=['GET'])
 def get_detection_status(stream_id):
     """

@@ -419,15 +419,22 @@ class ThumbnailCapture:
         return os.path.join(self.thumbnail_path, latest)
 
 
+from utils.email_alert import EmailAlertService
+
+
 class DetectionPipeline:
     """
     Complete detection pipeline that integrates motion/human detection,
-    video recording, and thumbnail capture
+    video recording, thumbnail capture, and email alerts
     """
 
     def __init__(self, camera_id, storage_path, detection_type='MOTION',
                  sensitivity=50, confidence_threshold=0.5,
-                 recording_duration=180, fps=30, resolution=(640, 480)):
+                 recording_duration=180, fps=30, resolution=(640, 480),
+                 # Alert settings
+                 alert_enabled=False, alert_email=None,
+                 alert_api_username=None, alert_api_password=None,
+                 camera_name=None, camera_location=None):
         """
         Args:
             camera_id: Camera identifier
@@ -438,6 +445,12 @@ class DetectionPipeline:
             recording_duration: Recording duration in seconds
             fps: Frames per second for recording
             resolution: (width, height) tuple
+            alert_enabled: Whether email alerts are enabled
+            alert_email: Email address to send alerts to
+            alert_api_username: Basic auth username for webhook
+            alert_api_password: Basic auth password for webhook
+            camera_name: Human-readable camera name
+            camera_location: Camera location description
         """
         self.camera_id = camera_id
         self.storage_path = storage_path
@@ -448,6 +461,18 @@ class DetectionPipeline:
         self.detector = CombinedDetector(detection_type, sensitivity, confidence_threshold) if self.is_enabled else None
         self.recorder = VideoRecorder(storage_path, camera_id, recording_duration, fps, resolution)
         self.thumbnail = ThumbnailCapture(storage_path, camera_id)
+
+        # Initialize email alert service
+        self.email_alert = EmailAlertService(
+            camera_id=camera_id,
+            camera_name=camera_name or f"Camera {camera_id}",
+            camera_location=camera_location or "Unknown",
+            alert_email=alert_email,
+            alert_api_username=alert_api_username,
+            alert_api_password=alert_api_password,
+            alert_enabled=alert_enabled,
+            rate_limit_minutes=3  # 3 minutes between alerts
+        )
 
         # Detection state
         self.last_detection_time = 0
@@ -475,7 +500,9 @@ class DetectionPipeline:
             'thumbnail_captured': False,
             'recording_info': None,
             'thumbnail_info': None,
-            'detection_details': None
+            'detection_details': None,
+            'alert_sent': False,
+            'alert_result': None
         }
 
         if not self.is_enabled:
@@ -518,6 +545,17 @@ class DetectionPipeline:
                         'thumbnail_path': thumbnail_info['file_path']
                     })
 
+                # Send email alert ONLY for human detection
+                if detection['human_detected'] and detection.get('human_detections'):
+                    human_count = len(detection['human_detections'])
+                    alert_result = self.email_alert.send_alert(
+                        frame=frame,
+                        detection_count=human_count,
+                        detection_details=detection['human_detections']
+                    )
+                    result['alert_sent'] = alert_result.get('success', False)
+                    result['alert_result'] = alert_result
+
         # Write frame to recording if active
         if self.recorder.is_recording:
             if not self.recorder.write_frame(frame):
@@ -555,6 +593,18 @@ class DetectionPipeline:
         if confidence_threshold is not None and self.detector and self.detector.human_detector:
             self.detector.human_detector.confidence_threshold = confidence_threshold
 
+    def update_alert_settings(self, alert_email=None, alert_api_username=None, alert_api_password=None,
+                              alert_enabled=None, camera_name=None, camera_location=None):
+        """Update email alert settings"""
+        self.email_alert.update_settings(
+            alert_email=alert_email,
+            alert_api_username=alert_api_username,
+            alert_api_password=alert_api_password,
+            alert_enabled=alert_enabled,
+            camera_name=camera_name,
+            camera_location=camera_location
+        )
+
     def get_status(self):
         """Get current pipeline status"""
         return {
@@ -563,6 +613,7 @@ class DetectionPipeline:
             'is_enabled': self.is_enabled,
             'recording_status': self.recorder.get_status(),
             'detection_events_count': len(self.detection_events),
-            'last_detection_time': self.last_detection_time
+            'last_detection_time': self.last_detection_time,
+            'alert_status': self.email_alert.get_status()
         }
 

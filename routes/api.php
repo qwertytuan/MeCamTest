@@ -82,6 +82,10 @@ Route::group([
      Route::post('/cameras/{id}/detection', [CameraController::class, 'updateDetectionSettings']);
      Route::get('/cameras/{id}/detection/status', [CameraController::class, 'getDetectionStatus']);
 
+     // Alert email routes
+     Route::post('/cameras/{id}/alert', [CameraController::class, 'updateAlertSettings']);
+     Route::get('/cameras/{id}/alert', [CameraController::class, 'getAlertSettings']);
+
      // Recording routes
      Route::get('/cameras/{id}/recordings', [CameraController::class, 'getRecordings']);
      Route::delete('/cameras/{cameraId}/recordings/{filename}', [CameraController::class, 'deleteRecording']);

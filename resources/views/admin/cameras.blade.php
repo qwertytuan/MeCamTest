@@ -1523,6 +1523,43 @@
                     </div>
                 </div>
 
+                <!-- Alert Email Settings Section -->
+                <div id="alertSettingsSection" style="margin-top: 1.5rem; padding: 1rem; background: var(--bg-main); border-radius: 8px; border: 1px solid var(--border); display: none;">
+                    <h4 style="font-size: 1rem; font-weight: 600; color: var(--text-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                        </svg>
+                        Alert Email Settings
+                    </h4>
+
+                    <div class="form-group">
+                        <label class="form-label">
+                            <input type="checkbox" id="alertEnabled" style="margin-right: 0.5rem;">
+                            Enable Email Alerts
+                        </label>
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Send email notification when human is detected (rate limited to once per 3 minutes)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="alertEmail">Alert Email Address</label>
+                        <input type="email" id="alertEmail" class="form-input" placeholder="e.g., security@example.com">
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Email address to receive detection alerts</small>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label class="form-label" for="alertApiUsername">API Username</label>
+                            <input type="text" id="alertApiUsername" class="form-input" placeholder="Username for webhook authentication">
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="alertApiPassword">API Password</label>
+                            <input type="password" id="alertApiPassword" class="form-input" placeholder="Password for webhook authentication">
+                        </div>
+                    </div>
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Credentials for webhook Basic Auth authentication</small>
+                </div>
+
                 <!-- Auto-detect Camera Info Button -->
                 <div class="form-group">
                     <button type="button" class="btn btn-secondary" onclick="detectCameraInfo()" id="detectBtn" style="width: 100%;">
@@ -1657,6 +1694,7 @@
                         <th>Type</th>
                         <th>Status</th>
                         <th>Detection</th>
+                        <th>Alert</th>
                         <th>Resolution</th>
                         <th>Location</th>
                         <th>Actions</th>
@@ -1693,6 +1731,20 @@
                                 <span style="display: inline-block; padding: 0.25rem 0.5rem; background: ${getDetectionColor(camera.detection_type)}; color: white; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
                                     ${getDetectionLabel(camera.detection_type)}
                                 </span>
+                            </td>
+                            <td>
+                                ${camera.alert_enabled ? `
+                                    <span style="display: inline-flex; align-items: center; gap: 0.25rem; padding: 0.25rem 0.5rem; background: #dd6b20; color: white; border-radius: 4px; font-size: 0.75rem; font-weight: 600;" title="Alerts: ${camera.alert_email || 'No email set'}">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
+                                        </svg>
+                                        On
+                                    </span>
+                                ` : `
+                                    <span style="display: inline-block; padding: 0.25rem 0.5rem; background: #718096; color: white; border-radius: 4px; font-size: 0.75rem; font-weight: 600;">
+                                        Off
+                                    </span>
+                                `}
                             </td>
                             <td style="color: var(--text-secondary); font-size: 0.85rem;">${camera.resolution || 'N/A'}</td>
                             <td style="color: var(--text-secondary); font-size: 0.85rem;">${camera.location || '-'}</td>
@@ -1773,13 +1825,21 @@
         const detectionType = document.getElementById('detectionType').value;
         const sensitivityGroup = document.getElementById('sensitivityGroup');
         const recordingSettingsGroup = document.getElementById('recordingSettingsGroup');
+        const alertSettingsSection = document.getElementById('alertSettingsSection');
 
         if (detectionType === 'NONE') {
             sensitivityGroup.style.display = 'none';
             recordingSettingsGroup.style.display = 'none';
+            alertSettingsSection.style.display = 'none';
         } else {
             sensitivityGroup.style.display = 'block';
             recordingSettingsGroup.style.display = 'grid';
+            // Show alert settings for human detection modes
+            if (detectionType === 'HUMAN' || detectionType === 'MOTION_HUMAN') {
+                alertSettingsSection.style.display = 'block';
+            } else {
+                alertSettingsSection.style.display = 'none';
+            }
         }
     }
 
@@ -1799,6 +1859,11 @@
         document.getElementById('detectionSensitivity').value = 50;
         document.getElementById('recordingDuration').value = 180;
         document.getElementById('thumbnailEnabled').checked = true;
+        // Reset alert settings
+        document.getElementById('alertEnabled').checked = false;
+        document.getElementById('alertEmail').value = '';
+        document.getElementById('alertApiUsername').value = '';
+        document.getElementById('alertApiPassword').value = '';
         toggleConnectionFields();
         toggleDetectionSettings();
         updateSensitivityLabel();
@@ -1834,6 +1899,13 @@
         document.getElementById('detectionSensitivity').value = camera.detection_sensitivity || 50;
         document.getElementById('recordingDuration').value = camera.recording_duration || 180;
         document.getElementById('thumbnailEnabled').checked = camera.thumbnail_enabled !== false;
+
+        // Populate alert settings
+        document.getElementById('alertEnabled').checked = camera.alert_enabled === true || camera.alert_enabled === 1;
+        document.getElementById('alertEmail').value = camera.alert_email || '';
+        document.getElementById('alertApiUsername').value = camera.alert_api_username || '';
+        document.getElementById('alertApiPassword').value = ''; // Don't populate password for security
+
         toggleDetectionSettings();
         updateSensitivityLabel();
 
@@ -1943,8 +2015,18 @@
             detection_type: document.getElementById('detectionType').value,
             detection_sensitivity: parseInt(document.getElementById('detectionSensitivity').value),
             recording_duration: parseInt(document.getElementById('recordingDuration').value),
-            thumbnail_enabled: document.getElementById('thumbnailEnabled').checked
+            thumbnail_enabled: document.getElementById('thumbnailEnabled').checked,
+            // Alert settings
+            alert_enabled: document.getElementById('alertEnabled').checked,
+            alert_email: document.getElementById('alertEmail').value || null,
+            alert_api_username: document.getElementById('alertApiUsername').value || null
         };
+
+        // Only include alert password if it's been filled in (not empty placeholder)
+        const alertPassword = document.getElementById('alertApiPassword').value;
+        if (alertPassword) {
+            formData.alert_api_password = alertPassword;
+        }
 
         // Add connection-specific fields
         if (connectionType === 'USB') {

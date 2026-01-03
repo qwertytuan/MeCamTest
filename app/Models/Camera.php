@@ -37,17 +37,25 @@ class Camera extends Model
         // Thumbnail settings
         'thumbnail_enabled',
         'thumbnail_url',
+        // Alert email settings
+        'alert_email',
+        'alert_api_username',
+        'alert_api_password',
+        'alert_enabled',
     ];
 
     protected $hidden = [
         'stream_username',
         'stream_password',
+        'alert_api_username',
+        'alert_api_password',
     ];
 
     protected $casts = [
         'is_active' => 'boolean',
         'detection_enabled' => 'boolean',
         'thumbnail_enabled' => 'boolean',
+        'alert_enabled' => 'boolean',
         'detection_sensitivity' => 'integer',
         'recording_duration' => 'integer',
         'frame_rate' => 'integer',

@@ -67,6 +67,11 @@ class CameraController extends Controller
                 'recording_duration' => 'nullable|integer|min:30|max:600',
                 // Thumbnail settings
                 'thumbnail_enabled' => 'nullable|boolean',
+                // Alert settings validation
+                'alert_enabled' => 'nullable|boolean',
+                'alert_email' => 'nullable|email|max:255',
+                'alert_api_username' => 'nullable|string|max:255',
+                'alert_api_password' => 'nullable|string|max:255',
             ]);
             $camera = Camera::create([
                 'name' => $request->name,
@@ -87,6 +92,11 @@ class CameraController extends Controller
                 'recording_duration' => $request->recording_duration ?? 180,
                 // Thumbnail settings
                 'thumbnail_enabled' => $request->thumbnail_enabled ?? true,
+                // Alert settings
+                'alert_enabled' => $request->alert_enabled ?? false,
+                'alert_email' => $request->alert_email,
+                'alert_api_username' => $request->alert_api_username,
+                'alert_api_password' => $request->alert_api_password,
             ]);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 400);
@@ -126,6 +136,11 @@ class CameraController extends Controller
                 'recording_duration' => 'nullable|integer|min:30|max:600',
                 // Thumbnail settings
                 'thumbnail_enabled' => 'nullable|boolean',
+                // Alert settings validation
+                'alert_enabled' => 'nullable|boolean',
+                'alert_email' => 'nullable|email|max:255',
+                'alert_api_username' => 'nullable|string|max:255',
+                'alert_api_password' => 'nullable|string|max:255',
             ]);
             $camera->update($request->all());
         } catch (Exception $e) {
@@ -184,6 +199,13 @@ class CameraController extends Controller
             'detection_type' => $camera->detection_type ?? 'NONE',
             'detection_sensitivity' => $camera->detection_sensitivity ?? 50,
             'recording_duration' => $camera->recording_duration ?? 180,
+            // Alert settings
+            'alert_enabled' => $camera->alert_enabled ?? false,
+            'alert_email' => $camera->alert_email,
+            'alert_api_username' => $camera->alert_api_username,
+            'alert_api_password' => $camera->alert_api_password,
+            'camera_name' => $camera->name,
+            'camera_location' => $camera->location,
         ];
         if($camera->connection_type === 'USB') {
             $body['camera_connection_path'] = $camera->usb_path;
@@ -456,6 +478,89 @@ class CameraController extends Controller
         }
 
         return response()->json(['success' => true, 'status' => $status]);
+    }
+
+    /**
+     * Update alert email settings for a camera
+     */
+    public function updateAlertSettings(Request $request, string $id): JsonResponse
+    {
+        $camera = Camera::findOrFail($id);
+
+        if (auth()->id() !== $camera->added_by && !auth()->user()->is_admin) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        try {
+            $request->validate([
+                'alert_email' => 'required|email|max:255',
+                'alert_api_username' => 'required|string|max:255',
+                'alert_api_password' => 'required|string|max:255',
+                'alert_enabled' => 'nullable|boolean',
+            ]);
+
+            $camera->update([
+                'alert_email' => $request->alert_email,
+                'alert_api_username' => $request->alert_api_username,
+                'alert_api_password' => $request->alert_api_password,
+                'alert_enabled' => $request->alert_enabled ?? false,
+            ]);
+
+            // If camera is active, update the Python stream settings
+            if ($camera->is_active && $camera->websocket_url) {
+                $activeStreams = $this->fetchActiveCameras();
+                $streamId = null;
+
+                if (isset($activeStreams['success']) && $activeStreams['success']) {
+                    foreach ($activeStreams['cameras'] ?? [] as $stream) {
+                        if ($stream['camera_id'] == $camera->id) {
+                            $streamId = $stream['stream_id'];
+                            break;
+                        }
+                    }
+                }
+
+                if ($streamId && $request->alert_enabled) {
+                    Http::timeout(10)->post("http://localhost:5000/api/camera/alert/{$streamId}", [
+                        'alert_email' => $request->alert_email,
+                        'alert_api_username' => $request->alert_api_username,
+                        'alert_api_password' => $request->alert_api_password,
+                        'alert_enabled' => $request->alert_enabled ?? false,
+                        'camera_name' => $camera->name,
+                        'camera_location' => $camera->location,
+                    ]);
+                }
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Alert settings updated',
+                'camera' => $camera->fresh()
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Get alert settings for a camera
+     */
+    public function getAlertSettings(string $id): JsonResponse
+    {
+        $camera = Camera::findOrFail($id);
+
+        if (auth()->id() !== $camera->added_by && !auth()->user()->is_admin) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        return response()->json([
+            'success' => true,
+            'alert_settings' => [
+                'alert_email' => $camera->alert_email,
+                'alert_enabled' => $camera->alert_enabled,
+            ]
+        ]);
     }
 
     /**
