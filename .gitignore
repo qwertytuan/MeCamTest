@@ -24,6 +24,20 @@ Homestead.yaml
 Thumbs.db
 ./PythonCamConnect/.venv
 ./PythonCamConnect/__pycache__
-./PythonCamConnect/storage/recordings/*
-./PythonCamConnect/storage/thumbnails/*
+./PythonCamConnect/storage/recordings/
+./PythonCamConnect/storage/thumbnails/
 ./PythonCamConnect/.git
+./PythonCamConnect/.cache
+
+# Video and image cache
+*.mp4
+*.jpg
+*.jpeg
+*.png
+!public/**/*.jpg
+!public/**/*.jpeg
+!public/**/*.png
+!resources/**/*.jpg
+!resources/**/*.jpeg
+!resources/**/*.png
+
