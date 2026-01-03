@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toggle Switch Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 50px;
+            background: #f7fafc;
+        }
+
+        .test-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        /* Toggle Switch Styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 26px;
+            margin: 10px;
+        }
+
+        .toggle-switch input[type="checkbox"] {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            position: absolute;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(145deg, #f56565, #e53e3e);
+            border-radius: 34px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 3px;
+            bottom: 3px;
+            background-color: #ffffff;
+            border-radius: 50%;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Checked state - GREEN */
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider {
+            background: linear-gradient(145deg, #48bb78, #38a169);
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider:before {
+            transform: translateX(24px);
+        }
+
+        /* Hover effects */
+        .toggle-slider:hover {
+            box-shadow: 0 3px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .toggle-switch input[type="checkbox"]:checked + .toggle-slider:hover {
+            background: linear-gradient(145deg, #38a169, #2f855a);
+        }
+
+        .test-item {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Toggle Switch Test</h1>
+        <p>Test the toggle colors - OFF should be RED, ON should be GREEN</p>
+
+        <div class="test-item">
+            <span>Toggle 1 (Default OFF):</span>
+            <label class="toggle-switch">
+                <input type="checkbox" onchange="console.log('Toggle 1:', this.checked)">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="test-item">
+            <span>Toggle 2 (Checked ON):</span>
+            <label class="toggle-switch">
+                <input type="checkbox" checked onchange="console.log('Toggle 2:', this.checked)">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div class="test-item">
+            <span>Toggle 3 (Default OFF):</span>
+            <label class="toggle-switch">
+                <input type="checkbox" onchange="console.log('Toggle 3:', this.checked)">
+                <span class="toggle-slider"></span>
+            </label>
+        </div>
+
+        <div style="margin-top: 30px; padding: 15px; background: #fff5f5; border-radius: 6px;">
+            <h3>Expected Colors:</h3>
+            <ul>
+                <li>🔴 <strong>OFF (Unchecked):</strong> Red background</li>
+                <li>🟢 <strong>ON (Checked):</strong> Green background</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        // Add listener to log all changes
+        document.querySelectorAll('.toggle-switch input').forEach((toggle, index) => {
+            toggle.addEventListener('change', function() {
+                console.log(`Toggle ${index + 1} changed to:`, this.checked ? 'ON (GREEN)' : 'OFF (RED)');
+            });
+        });
+    </script>
+</body>
+</html>
+
