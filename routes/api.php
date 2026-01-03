@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\CameraAccessController;
 use App\Http\Controllers\CameraController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Support\Facades\Route;
@@ -81,4 +82,23 @@ Route::group([
      // Thumbnail routes
      Route::get('/cameras/{id}/thumbnails', [CameraController::class, 'getThumbnails']);
      Route::post('/cameras/{id}/thumbnail/capture', [CameraController::class, 'captureThumbnail']);
+
+     // Share token routes (admin only)
+     Route::post('/cameras/{id}/share', [CameraController::class, 'generateShareToken']);
+     Route::get('/cameras/{id}/share-tokens', [CameraController::class, 'getShareTokens']);
+     Route::delete('/cameras/{cameraId}/share-tokens/{tokenId}', [CameraController::class, 'revokeShareToken']);
+
+     // Camera user access routes (admin only)
+     Route::get('/cameras/{cameraId}/access', [CameraAccessController::class, 'getCameraAccessList']);
+     Route::post('/cameras/{cameraId}/access', [CameraAccessController::class, 'grantAccess']);
+     Route::put('/cameras/{cameraId}/access/{accessId}', [CameraAccessController::class, 'updateAccess']);
+     Route::delete('/cameras/{cameraId}/access/{accessId}', [CameraAccessController::class, 'revokeAccess']);
+
+     // Get all users for dropdown (non-admin users)
+     Route::get('/users/available', [AdminController::class, 'getAvailableUsers']);
  });
+
+// Public share token validation (no auth required) - placed outside all auth middleware groups
+Route::withoutMiddleware(['auth:api', 'auth'])->group(function () {
+    Route::get('/share/validate/{token}', [CameraController::class, 'validateShareToken']);
+});

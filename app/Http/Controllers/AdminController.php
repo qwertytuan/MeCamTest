@@ -52,4 +52,20 @@ class AdminController extends Controller
         $user->products()->onlyTrashed()->restore();
         return response()->json(['message' => 'User restored successfully']);
     }
+
+    /**
+     * Get available users for camera access assignment (non-admin users only)
+     */
+    public function getAvailableUsers(): JsonResponse
+    {
+        $users = User::where('is_admin', false)
+            ->select('id', 'name', 'email')
+            ->orderBy('name')
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'users' => $users
+        ]);
+    }
 }

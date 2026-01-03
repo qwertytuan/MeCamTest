@@ -15,6 +15,11 @@ Route::get('/register', static function () {
     return view('auth.register');
 })->name('register');
 
+// Public shared camera stream (no auth required)
+Route::get('/share/camera/{token}', static function ($token) {
+    return view('shared.camera-stream', ['token' => $token]);
+})->name('shared.camera');
+
 // Protected routes (JWT auth handled client-side)
 Route::get('/dashboard', static function () {
     return view('dashboard.index');

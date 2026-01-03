@@ -53,7 +53,7 @@
 
     .camera-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
         gap: 1.5rem;
         margin-bottom: 2rem;
     }
@@ -72,21 +72,27 @@
         transform: translateY(-2px);
     }
 
+    .camera-card.detection-active {
+        border-color: #f56565;
+        box-shadow: 0 0 20px rgba(245, 101, 101, 0.3);
+    }
+
     .camera-preview {
         position: relative;
         width: 100%;
-        height: 240px;
+        height: 280px;
         background: #1a202c;
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        cursor: pointer;
     }
 
     .camera-preview canvas {
         width: 100%;
         height: 100%;
-        object-fit: cover;
+        object-fit: contain;
     }
 
     .camera-preview.no-stream {
@@ -105,6 +111,91 @@
         width: 48px;
         height: 48px;
         opacity: 0.5;
+    }
+
+    /* Detection Alert Overlay */
+    .detection-alert-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 0, 0, 0.15);
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.3s;
+        display: flex;
+        align-items: flex-start;
+        justify-content: center;
+        padding-top: 1rem;
+    }
+
+    .detection-alert-overlay.active {
+        opacity: 1;
+        animation: pulse-border 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse-border {
+        0%, 100% { background: rgba(255, 0, 0, 0.1); }
+        50% { background: rgba(255, 0, 0, 0.25); }
+    }
+
+    .detection-badge {
+        background: rgba(220, 38, 38, 0.95);
+        color: white;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        animation: bounce 0.5s ease-in-out;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    .detection-badge svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    /* Recording indicator */
+    .recording-indicator {
+        position: absolute;
+        top: 0.75rem;
+        left: 0.75rem;
+        background: rgba(220, 38, 38, 0.9);
+        color: white;
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.375rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .recording-indicator.active {
+        opacity: 1;
+    }
+
+    .recording-indicator .rec-dot {
+        width: 8px;
+        height: 8px;
+        background: white;
+        border-radius: 50%;
+        animation: blink 1s ease-in-out infinite;
+    }
+
+    @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.3; }
     }
 
     .camera-status {
@@ -132,6 +223,62 @@
     .status-badge.inactive {
         background: rgba(113, 128, 150, 0.9);
         color: white;
+    }
+
+    /* Camera Controls Toolbar */
+    .camera-controls-toolbar {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.8));
+        padding: 2rem 0.75rem 0.75rem;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .camera-preview:hover .camera-controls-toolbar {
+        opacity: 1;
+    }
+
+    .camera-controls-toolbar.always-visible {
+        opacity: 1;
+    }
+
+    .control-btn {
+        width: 36px;
+        height: 36px;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
+    }
+
+    .control-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.1);
+    }
+
+    .control-btn:active {
+        transform: scale(0.95);
+    }
+
+    .control-btn svg {
+        width: 18px;
+        height: 18px;
+    }
+
+    .control-btn.danger:hover {
+        background: rgba(220, 38, 38, 0.8);
     }
 
     .camera-info {
@@ -191,7 +338,7 @@
         color: white;
         border: none;
         padding: 0.75rem;
-        border-radius: 0 0 0 12px;
+        border-radius: 8px;
         font-size: 0.9rem;
         font-weight: 600;
         display: flex;
@@ -210,6 +357,333 @@
         background: #9ca3af;
         cursor: not-allowed;
         opacity: 0.6;
+    }
+
+    .recordings-btn {
+        flex: 1;
+        background: var(--bg-main);
+        color: var(--text-primary);
+        border: 1px solid var(--border);
+        padding: 0.75rem;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .recordings-btn:hover {
+        background: var(--border);
+    }
+
+    /* Fullscreen Modal */
+    .fullscreen-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.95);
+        z-index: 10000;
+        display: none;
+        flex-direction: column;
+    }
+
+    .fullscreen-modal.active {
+        display: flex;
+    }
+
+    .fullscreen-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem 1.5rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+    }
+
+    .fullscreen-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .fullscreen-header-controls {
+        display: flex;
+        gap: 0.75rem;
+    }
+
+    .fullscreen-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .fullscreen-content canvas {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain;
+    }
+
+    .fullscreen-controls {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(transparent, rgba(0, 0, 0, 0.9));
+        padding: 3rem 2rem 1.5rem;
+        display: flex;
+        justify-content: center;
+        gap: 1rem;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+    .fullscreen-content:hover .fullscreen-controls {
+        opacity: 1;
+    }
+
+    .fullscreen-btn {
+        padding: 0.75rem 1.25rem;
+        border: none;
+        border-radius: 8px;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s;
+        backdrop-filter: blur(10px);
+    }
+
+    .fullscreen-btn:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: scale(1.05);
+    }
+
+    .fullscreen-btn svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    /* Detection Alert in Fullscreen */
+    .fullscreen-detection-alert {
+        position: absolute;
+        top: 1rem;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(220, 38, 38, 0.95);
+        color: white;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        display: none;
+        align-items: center;
+        gap: 0.75rem;
+        animation: slideDown 0.3s ease-out;
+    }
+
+    .fullscreen-detection-alert.active {
+        display: flex;
+    }
+
+    @keyframes slideDown {
+        from { transform: translateX(-50%) translateY(-20px); opacity: 0; }
+        to { transform: translateX(-50%) translateY(0); opacity: 1; }
+    }
+
+    /* Recordings Modal */
+    .recordings-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        z-index: 10000;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .recordings-modal.active {
+        display: flex;
+    }
+
+    .recordings-modal-content {
+        background: var(--bg-card);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 800px;
+        max-height: 80vh;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .recordings-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1.25rem 1.5rem;
+        border-bottom: 1px solid var(--border);
+    }
+
+    .recordings-modal-header h3 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .recordings-modal-body {
+        flex: 1;
+        overflow-y: auto;
+        padding: 1rem;
+    }
+
+    .recordings-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+    }
+
+    .recording-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 1rem;
+        background: var(--bg-main);
+        border-radius: 8px;
+        border: 1px solid var(--border);
+        transition: all 0.2s;
+    }
+
+    .recording-item:hover {
+        border-color: var(--accent);
+    }
+
+    .recording-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .recording-icon {
+        width: 48px;
+        height: 48px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .recording-icon svg {
+        width: 24px;
+        height: 24px;
+    }
+
+    .recording-details h4 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .recording-details p {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+    }
+
+    .recording-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    /* Video Player Modal */
+    .video-player-modal {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.9);
+        z-index: 10001;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .video-player-modal.active {
+        display: flex;
+    }
+
+    .video-player-content {
+        background: #000;
+        border-radius: 12px;
+        overflow: hidden;
+        max-width: 90vw;
+        max-height: 90vh;
+    }
+
+    .video-player-content video {
+        max-width: 100%;
+        max-height: 80vh;
+    }
+
+    .video-player-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: rgba(0, 0, 0, 0.8);
+        color: white;
+    }
+
+    /* Toast Notification */
+    .toast-notification {
+        position: fixed;
+        bottom: 2rem;
+        right: 2rem;
+        background: var(--bg-card);
+        border-radius: 8px;
+        padding: 1rem 1.5rem;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        transform: translateX(150%);
+        transition: transform 0.3s ease-out;
+        z-index: 10002;
+        border-left: 4px solid var(--accent);
+    }
+
+    .toast-notification.active {
+        transform: translateX(0);
+    }
+
+    .toast-notification.success {
+        border-left-color: #48bb78;
+    }
+
+    .toast-notification.warning {
+        border-left-color: #ed8936;
+    }
+
+    .toast-notification.error {
+        border-left-color: #f56565;
     }
 
     .empty-state {
@@ -268,6 +742,11 @@
         margin: 0 auto 1rem;
     }
 
+    @keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
     @media (max-width: 768px) {
         .camera-grid {
             grid-template-columns: 1fr;
@@ -286,6 +765,10 @@
 
         .search-box {
             width: 100%;
+        }
+
+        .fullscreen-controls {
+            flex-wrap: wrap;
         }
     }
     </style>
@@ -330,6 +813,100 @@
     </div>
 </div>
 
+<!-- Fullscreen Modal -->
+<div id="fullscreenModal" class="fullscreen-modal">
+    <div class="fullscreen-header">
+        <h3 id="fullscreenTitle">Camera Stream</h3>
+        <div class="fullscreen-header-controls">
+            <button class="control-btn" onclick="captureFrame()" title="Capture Frame">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+            </button>
+            <button class="control-btn danger" onclick="closeFullscreen()" title="Close">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <div class="fullscreen-content" ondblclick="closeFullscreen()">
+        <canvas id="fullscreenCanvas"></canvas>
+        <div id="fullscreenDetectionAlert" class="fullscreen-detection-alert">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+            </svg>
+            <span id="fullscreenAlertText">Detection Alert</span>
+        </div>
+        <div class="fullscreen-controls">
+            <button class="fullscreen-btn" onclick="captureFrame()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+                Capture Frame
+            </button>
+            <button class="fullscreen-btn" onclick="openRecordingsFromFullscreen()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                </svg>
+                View Recordings
+            </button>
+            <button class="fullscreen-btn" onclick="closeFullscreen()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+                Exit Fullscreen
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Recordings Modal -->
+<div id="recordingsModal" class="recordings-modal">
+    <div class="recordings-modal-content">
+        <div class="recordings-modal-header">
+            <h3 id="recordingsModalTitle">Camera Recordings</h3>
+            <button class="control-btn" onclick="closeRecordingsModal()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <div class="recordings-modal-body">
+            <div id="recordingsList" class="recordings-list">
+                <!-- Recordings will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Video Player Modal -->
+<div id="videoPlayerModal" class="video-player-modal">
+    <div class="video-player-content">
+        <div class="video-player-header">
+            <span id="videoPlayerTitle">Recording Playback</span>
+            <button class="control-btn" onclick="closeVideoPlayer()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+        <video id="recordingVideo" controls autoplay>
+            Your browser does not support the video tag.
+        </video>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toastNotification" class="toast-notification">
+    <svg id="toastIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+    </svg>
+    <span id="toastMessage">Notification</span>
+</div>
+
 <div id="loadingOverlay" class="loading-overlay" style="display: none;">
     <div class="loading-content">
         <div class="loading-spinner"></div>
@@ -341,6 +918,12 @@
 <script>
     let cameras = [];
     let activeStreams = {};
+    let fullscreenCameraId = null;
+    let currentRecordingsCameraId = null;
+    let detectionAlertTimeout = null;
+
+    // Python camera server base URL
+    const PYTHON_SERVER_URL = 'http://localhost:5000';
 
     document.addEventListener('DOMContentLoaded', function() {
         loadCameras();
@@ -348,6 +931,25 @@
         // Search functionality
         document.getElementById('searchInput').addEventListener('input', filterCameras);
         document.getElementById('statusFilter').addEventListener('change', filterCameras);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                if (document.getElementById('videoPlayerModal').classList.contains('active')) {
+                    closeVideoPlayer();
+                } else if (document.getElementById('recordingsModal').classList.contains('active')) {
+                    closeRecordingsModal();
+                } else if (document.getElementById('fullscreenModal').classList.contains('active')) {
+                    closeFullscreen();
+                }
+            }
+            // Capture frame with 'C' key in fullscreen
+            if (e.key === 'c' || e.key === 'C') {
+                if (document.getElementById('fullscreenModal').classList.contains('active')) {
+                    captureFrame();
+                }
+            }
+        });
     });
 
     async function loadCameras() {
@@ -361,10 +963,10 @@
                 cameras = data.data || data;
                 renderCameras(cameras);
             } else {
-                showAlert('Failed to load cameras', 'error');
+                showToast('Failed to load cameras', 'error');
             }
         } catch (error) {
-            showAlert('Error loading cameras', 'error');
+            showToast('Error loading cameras', 'error');
         } finally {
             loadingOverlay.style.display = 'none';
         }
@@ -386,8 +988,8 @@
 
         // Generate HTML for all cameras
         cameraGrid.innerHTML = camerasToRender.map(camera => `
-            <div class="camera-card">
-                <div class="camera-preview ${!camera.is_active ? 'no-stream' : ''}">
+            <div class="camera-card" id="camera-card-${camera.id}">
+                <div class="camera-preview ${!camera.is_active ? 'no-stream' : ''}" onclick="openFullscreen(${camera.id})">
                     <canvas id="canvas-${camera.id}" width="640" height="480"></canvas>
                     ${!camera.is_active ? `
                         <div class="camera-preview-placeholder">
@@ -397,14 +999,53 @@
                             <p>Camera Offline</p>
                         </div>
                     ` : ''}
-                </div>
 
-                <div class="camera-info">
+                    <!-- Detection Alert Overlay -->
+                    <div id="detection-overlay-${camera.id}" class="detection-alert-overlay">
+                        <div class="detection-badge">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                            </svg>
+                            <span id="detection-text-${camera.id}">Motion Detected</span>
+                        </div>
+                    </div>
+
+                    <!-- Recording Indicator -->
+                    <div id="recording-indicator-${camera.id}" class="recording-indicator">
+                        <span class="rec-dot"></span>
+                        REC
+                    </div>
+
                     <div class="camera-status">
-                        <h3 class="camera-name">${camera.name}</h3>
                         <span class="status-badge ${camera.is_active ? 'active' : 'inactive'}">
                             ${camera.is_active ? 'Active' : 'Inactive'}
                         </span>
+                    </div>
+
+                    <!-- Camera Controls Toolbar -->
+                    <div class="camera-controls-toolbar" id="controls-${camera.id}">
+                        <button class="control-btn" onclick="event.stopPropagation(); openFullscreen(${camera.id})" title="Fullscreen">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/>
+                            </svg>
+                        </button>
+                        <button class="control-btn" onclick="event.stopPropagation(); captureFrameForCamera(${camera.id})" title="Capture Frame">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"/>
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"/>
+                            </svg>
+                        </button>
+                        <button class="control-btn" onclick="event.stopPropagation(); openRecordings(${camera.id})" title="View Recordings">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="camera-info">
+                    <div class="camera-status" style="position: static; margin-bottom: 0.5rem;">
+                        <h3 class="camera-name">${camera.name}</h3>
                     </div>
 
                     <p class="camera-location">
@@ -435,6 +1076,12 @@
                         </svg>
                         Play Stream
                     </button>
+                    <button class="recordings-btn" onclick="openRecordings(${camera.id})">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+                        </svg>
+                        Recordings
+                    </button>
                 </div>
             </div>
         `).join('');
@@ -443,47 +1090,26 @@
     function toggleStream(cameraId, button) {
         // Check if stream is already active
         if (activeStreams[cameraId]) {
-            // Stop stream
-            const streamState = activeStreams[cameraId];
-            if (streamState.ws) {
-                streamState.ws.close();
-            }
-            delete activeStreams[cameraId];
-
-            // Update button
-            button.innerHTML = `
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                </svg>
-                Play Stream
-            `;
-
-            // Clear canvas
-            const canvas = document.getElementById(`canvas-${cameraId}`);
-            if (canvas) {
-                const ctx = canvas.getContext('2d');
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-            }
+            stopStream(cameraId, button);
             return;
         }
 
         // Start stream
         const camera = cameras.find(c => c.id === cameraId);
         if (!camera || !camera.websocket_url) {
-            showAlert('Stream URL not available', 'error');
+            showToast('Stream URL not available', 'error');
             return;
         }
 
         const canvas = document.getElementById(`canvas-${cameraId}`);
         if (!canvas) {
-            showAlert('Canvas not found', 'error');
+            showToast('Canvas not found', 'error');
             return;
         }
 
         const ctx = canvas.getContext('2d');
         const streamUrl = camera.websocket_url;
-        console.log(`Connecting to JPEG stream for camera ${cameraId}:`, streamUrl);
+        console.log(`Connecting to stream for camera ${cameraId}:`, streamUrl);
 
         try {
             const ws = new WebSocket(streamUrl);
@@ -497,22 +1123,30 @@
                 ws: ws,
                 canvas: canvas,
                 ctx: ctx,
-                frameCount: 0
+                frameCount: 0,
+                cameraId: cameraId,
+                camera: camera
             };
 
             ws.onopen = () => {
-                console.log(`Connected to JPEG stream for camera ${cameraId}`);
-                showAlert('Stream connected successfully', 'success');
+                console.log(`Connected to stream for camera ${cameraId}`);
+                showToast('Stream connected successfully', 'success');
             };
 
             ws.onmessage = (event) => {
                 try {
-                    // Use createImageBitmap for better memory management (no Blob URL needed)
+                    // Check if it's a text message (detection metadata)
+                    if (typeof event.data === 'string') {
+                        handleDetectionMessage(cameraId, JSON.parse(event.data));
+                        return;
+                    }
+
+                    // Binary data - JPEG frame
                     const blob = new Blob([event.data], { type: 'image/jpeg' });
 
                     createImageBitmap(blob).then(imageBitmap => {
                         // Set canvas size on first frame
-                        if (canvas.width === 0 || canvas.height === 0) {
+                        if (canvas.width !== imageBitmap.width || canvas.height !== imageBitmap.height) {
                             canvas.width = imageBitmap.width;
                             canvas.height = imageBitmap.height;
                         }
@@ -520,10 +1154,22 @@
                         // Draw imageBitmap to canvas
                         ctx.drawImage(imageBitmap, 0, 0, canvas.width, canvas.height);
 
+                        // Also update fullscreen canvas if this camera is in fullscreen
+                        if (fullscreenCameraId === cameraId) {
+                            const fullscreenCanvas = document.getElementById('fullscreenCanvas');
+                            const fullscreenCtx = fullscreenCanvas.getContext('2d');
+                            if (fullscreenCanvas.width !== imageBitmap.width) {
+                                fullscreenCanvas.width = imageBitmap.width;
+                                fullscreenCanvas.height = imageBitmap.height;
+                            }
+                            fullscreenCtx.drawImage(imageBitmap, 0, 0, fullscreenCanvas.width, fullscreenCanvas.height);
+                        }
+
                         // Immediately close bitmap to free memory
                         imageBitmap.close();
 
                         frameCount++;
+                        streamState.frameCount = frameCount;
 
                         // Log FPS every 100 frames
                         if (frameCount % 100 === 0) {
@@ -536,35 +1182,19 @@
                         console.error(`Failed to create ImageBitmap for camera ${cameraId}:`, error);
                     });
 
-                    // Blob will be garbage collected automatically
                 } catch (error) {
-                    console.error(`Error processing JPEG data for camera ${cameraId}:`, error);
+                    console.error(`Error processing data for camera ${cameraId}:`, error);
                 }
             };
 
             ws.onerror = (error) => {
                 console.error(`WebSocket error for camera ${cameraId}:`, error);
-                showAlert('Stream connection error', 'error');
+                showToast('Stream connection error', 'error');
             };
 
             ws.onclose = () => {
                 console.log(`Connection closed for camera ${cameraId}`);
-
-                // Clear canvas
-                if (ctx && canvas) {
-                    ctx.clearRect(0, 0, canvas.width, canvas.height);
-                }
-
-                delete activeStreams[cameraId];
-
-                // Update button
-                button.innerHTML = `
-                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
-                    </svg>
-                    Play Stream
-                `;
+                stopStream(cameraId, button);
             };
 
             activeStreams[cameraId] = streamState;
@@ -576,12 +1206,319 @@
                 </svg>
                 Stop Stream
             `;
+            button.classList.add('active');
+
+            // Show controls toolbar
+            const controlsToolbar = document.getElementById(`controls-${cameraId}`);
+            if (controlsToolbar) {
+                controlsToolbar.classList.add('always-visible');
+            }
+
         } catch (error) {
-            showAlert('Failed to start stream: ' + error.message, 'error');
+            showToast('Failed to start stream: ' + error.message, 'error');
             console.error('Error starting stream:', error);
         }
     }
 
+    function stopStream(cameraId, button) {
+        const streamState = activeStreams[cameraId];
+        if (streamState) {
+            if (streamState.ws) {
+                streamState.ws.close();
+            }
+            delete activeStreams[cameraId];
+        }
+
+        // Update button
+        if (button) {
+            button.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                Play Stream
+            `;
+            button.classList.remove('active');
+        }
+
+        // Clear canvas
+        const canvas = document.getElementById(`canvas-${cameraId}`);
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Hide controls toolbar
+        const controlsToolbar = document.getElementById(`controls-${cameraId}`);
+        if (controlsToolbar) {
+            controlsToolbar.classList.remove('always-visible');
+        }
+
+        // Remove detection overlay
+        const detectionOverlay = document.getElementById(`detection-overlay-${cameraId}`);
+        if (detectionOverlay) {
+            detectionOverlay.classList.remove('active');
+        }
+
+        // Remove recording indicator
+        const recordingIndicator = document.getElementById(`recording-indicator-${cameraId}`);
+        if (recordingIndicator) {
+            recordingIndicator.classList.remove('active');
+        }
+    }
+
+    function handleDetectionMessage(cameraId, data) {
+        console.log(`Detection event for camera ${cameraId}:`, data);
+
+        if (data.type === 'detection') {
+            // Show detection alert overlay
+            const detectionOverlay = document.getElementById(`detection-overlay-${cameraId}`);
+            const detectionText = document.getElementById(`detection-text-${cameraId}`);
+            const cameraCard = document.getElementById(`camera-card-${cameraId}`);
+
+            if (detectionOverlay && detectionText) {
+                let alertText = 'Motion Detected';
+                if (data.detection_type === 'HUMAN' || data.detection_type === 'MOTION_HUMAN') {
+                    alertText = `Human Detected${data.human_count > 1 ? ` (${data.human_count})` : ''}`;
+                } else if (data.detection_type === 'MOTION') {
+                    alertText = 'Motion Detected';
+                }
+
+                detectionText.textContent = alertText;
+                detectionOverlay.classList.add('active');
+                cameraCard?.classList.add('detection-active');
+
+                // Update fullscreen alert if in fullscreen mode
+                if (fullscreenCameraId === cameraId) {
+                    const fullscreenAlert = document.getElementById('fullscreenDetectionAlert');
+                    const fullscreenAlertText = document.getElementById('fullscreenAlertText');
+                    if (fullscreenAlert && fullscreenAlertText) {
+                        fullscreenAlertText.textContent = alertText;
+                        fullscreenAlert.classList.add('active');
+                    }
+                }
+
+                // Clear previous timeout
+                if (detectionAlertTimeout) {
+                    clearTimeout(detectionAlertTimeout);
+                }
+
+                // Hide alert after 3 seconds
+                detectionAlertTimeout = setTimeout(() => {
+                    detectionOverlay.classList.remove('active');
+                    cameraCard?.classList.remove('detection-active');
+                    if (fullscreenCameraId === cameraId) {
+                        document.getElementById('fullscreenDetectionAlert')?.classList.remove('active');
+                    }
+                }, 3000);
+            }
+
+            // Show recording indicator
+            if (data.recording_active) {
+                const recordingIndicator = document.getElementById(`recording-indicator-${cameraId}`);
+                if (recordingIndicator) {
+                    recordingIndicator.classList.add('active');
+                }
+            }
+
+            // Play alert sound (optional)
+            // playAlertSound();
+        }
+    }
+
+    // Fullscreen functions
+    function openFullscreen(cameraId) {
+        if (!activeStreams[cameraId]) {
+            showToast('Please start the stream first', 'warning');
+            return;
+        }
+
+        fullscreenCameraId = cameraId;
+        const camera = cameras.find(c => c.id === cameraId);
+
+        document.getElementById('fullscreenTitle').textContent = camera?.name || 'Camera Stream';
+        document.getElementById('fullscreenModal').classList.add('active');
+
+        // Copy current frame to fullscreen canvas
+        const sourceCanvas = document.getElementById(`canvas-${cameraId}`);
+        const fullscreenCanvas = document.getElementById('fullscreenCanvas');
+        if (sourceCanvas && fullscreenCanvas) {
+            fullscreenCanvas.width = sourceCanvas.width;
+            fullscreenCanvas.height = sourceCanvas.height;
+            const ctx = fullscreenCanvas.getContext('2d');
+            ctx.drawImage(sourceCanvas, 0, 0);
+        }
+    }
+
+    function closeFullscreen() {
+        fullscreenCameraId = null;
+        document.getElementById('fullscreenModal').classList.remove('active');
+        document.getElementById('fullscreenDetectionAlert').classList.remove('active');
+    }
+
+    // Capture frame functions
+    function captureFrame() {
+        if (!fullscreenCameraId) return;
+        captureFrameForCamera(fullscreenCameraId);
+    }
+
+    function captureFrameForCamera(cameraId) {
+        const canvas = document.getElementById(`canvas-${cameraId}`);
+        if (!canvas) {
+            showToast('No stream available to capture', 'error');
+            return;
+        }
+
+        try {
+            // Create a temporary canvas to ensure we capture the current frame
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = canvas.width;
+            tempCanvas.height = canvas.height;
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCtx.drawImage(canvas, 0, 0);
+
+            // Convert to blob and download
+            tempCanvas.toBlob((blob) => {
+                if (blob) {
+                    const camera = cameras.find(c => c.id === cameraId);
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                    const filename = `${camera?.name || 'camera'}_${timestamp}.jpg`;
+
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+
+                    showToast('Frame captured and saved!', 'success');
+                }
+            }, 'image/jpeg', 0.95);
+        } catch (error) {
+            console.error('Error capturing frame:', error);
+            showToast('Failed to capture frame', 'error');
+        }
+    }
+
+    // Recordings functions
+    function openRecordings(cameraId) {
+        currentRecordingsCameraId = cameraId;
+        const camera = cameras.find(c => c.id === cameraId);
+        document.getElementById('recordingsModalTitle').textContent = `${camera?.name || 'Camera'} - Recordings`;
+        document.getElementById('recordingsModal').classList.add('active');
+        loadRecordings(cameraId);
+    }
+
+    function openRecordingsFromFullscreen() {
+        if (fullscreenCameraId) {
+            openRecordings(fullscreenCameraId);
+        }
+    }
+
+    function closeRecordingsModal() {
+        document.getElementById('recordingsModal').classList.remove('active');
+        currentRecordingsCameraId = null;
+    }
+
+    async function loadRecordings(cameraId) {
+        const recordingsList = document.getElementById('recordingsList');
+        recordingsList.innerHTML = '<div class="loading-spinner" style="margin: 2rem auto;"></div>';
+
+        try {
+            // Fetch recordings from Python server
+            const response = await fetch(`${PYTHON_SERVER_URL}/api/recordings/${cameraId}`);
+            const data = await response.json();
+
+            if (data.success && data.recordings && data.recordings.length > 0) {
+                recordingsList.innerHTML = data.recordings.map(recording => {
+                    const date = new Date(recording.created_at * 1000);
+                    const formattedDate = date.toLocaleString();
+                    const fileSize = formatFileSize(recording.file_size);
+
+                    return `
+                        <div class="recording-item">
+                            <div class="recording-info">
+                                <div class="recording-icon">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                    </svg>
+                                </div>
+                                <div class="recording-details">
+                                    <h4>${recording.filename}</h4>
+                                    <p>${formattedDate} • ${fileSize}</p>
+                                </div>
+                            </div>
+                            <div class="recording-actions">
+                                <button class="control-btn" onclick="playRecording('${recording.download_url}')" title="Play">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/>
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                </button>
+                                <button class="control-btn" onclick="downloadRecording('${recording.download_url}', '${recording.filename}')" title="Download">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } else {
+                recordingsList.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px; margin-bottom: 1rem; opacity: 0.5;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                        <p>No recordings available for this camera</p>
+                    </div>
+                `;
+            }
+        } catch (error) {
+            console.error('Error loading recordings:', error);
+            recordingsList.innerHTML = `
+                <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                    <p>Failed to load recordings. Make sure the camera server is running.</p>
+                </div>
+            `;
+        }
+    }
+
+    function playRecording(url) {
+        const fullUrl = `${PYTHON_SERVER_URL}${url}`;
+        document.getElementById('recordingVideo').src = fullUrl;
+        document.getElementById('videoPlayerTitle').textContent = 'Recording Playback';
+        document.getElementById('videoPlayerModal').classList.add('active');
+    }
+
+    function closeVideoPlayer() {
+        const video = document.getElementById('recordingVideo');
+        video.pause();
+        video.src = '';
+        document.getElementById('videoPlayerModal').classList.remove('active');
+    }
+
+    function downloadRecording(url, filename) {
+        const fullUrl = `${PYTHON_SERVER_URL}${url}`;
+        const a = document.createElement('a');
+        a.href = fullUrl;
+        a.download = filename;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        showToast('Download started', 'success');
+    }
+
+    // Utility functions
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 Bytes';
+        const k = 1024;
+        const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    }
 
     function filterCameras() {
         const searchTerm = document.getElementById('searchInput').value.toLowerCase();
@@ -601,25 +1538,32 @@
         renderCameras(filtered);
     }
 
-    function viewCameraDetails(cameraId) {
-        const camera = cameras.find(c => c.id === cameraId);
-        if (camera) {
-            alert(`Camera Details:\n\nName: ${camera.name}\nLocation: ${camera.location || 'N/A'}\nResolution: ${camera.resolution || 'N/A'}\nFrame Rate: ${camera.frame_rate || 'N/A'}\nStatus: ${camera.is_active ? 'Active' : 'Inactive'}\nSource: ${camera.rtsp_url || 'N/A'}`);
+    function showToast(message, type = 'success') {
+        const toast = document.getElementById('toastNotification');
+        const toastMessage = document.getElementById('toastMessage');
+        const toastIcon = document.getElementById('toastIcon');
+
+        toastMessage.textContent = message;
+        toast.className = `toast-notification ${type}`;
+
+        // Update icon based on type
+        if (type === 'success') {
+            toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+        } else if (type === 'error') {
+            toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"/>';
+        } else if (type === 'warning') {
+            toastIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>';
         }
+
+        toast.classList.add('active');
+
+        setTimeout(() => {
+            toast.classList.remove('active');
+        }, 3000);
     }
 
     function showAlert(message, type = 'error') {
-        const alertContainer = document.getElementById('alertContainer');
-        alertContainer.innerHTML = `
-        // modal alert
-        <div class="alert ${type === 'success' ? 'alert-success' : 'alert-error'}" role="alert" style="position: fixed; top: 1rem; right: 1rem; z-index: 10000; padding: 1rem 1.5rem; border-radius: 8px; box-shadow: var(--shadow-md); background-color: ${type === 'success' ? '#38a169' : '#e53e3e'}; color: white;">
-            ${message}
-        </div>
-        `;
-
-        setTimeout(() => {
-            alertContainer.innerHTML = '';
-        }, 10000);
+        showToast(message, type);
     }
 
     // Clean up on page unload
@@ -627,20 +1571,13 @@
         console.log('Cleaning up all active streams before page unload');
         Object.keys(activeStreams).forEach(cameraId => {
             const stream = activeStreams[cameraId];
-
-            // Close WebSocket
             if (stream.ws) {
                 stream.ws.close();
             }
-
-
-            // Clear canvas
             if (stream.canvas && stream.ctx) {
                 stream.ctx.clearRect(0, 0, stream.canvas.width, stream.canvas.height);
             }
         });
-
-        // Clear all streams
         activeStreams = {};
     });
 

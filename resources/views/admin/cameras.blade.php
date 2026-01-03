@@ -331,23 +331,28 @@
     .share-access-section {
         margin-top: 2rem;
         padding: 1.5rem;
-        background: var(--bg-main);
+        background: var(--bg-card);
         border-radius: 8px;
-        border: 1px dashed var(--border);
+        border: 2px dashed var(--accent);
+        box-shadow: var(--shadow-sm);
     }
 
     .share-access-section h3 {
-        font-size: 1rem;
+        font-size: 1.1rem;
         font-weight: 600;
         color: var(--text-primary);
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
         display: flex;
         align-items: center;
         gap: 0.5rem;
     }
 
-    .share-access-section p {
-        font-size: 0.85rem;
+    .share-access-section h3 svg {
+        color: var(--accent);
+    }
+
+    .share-access-section > p {
+        font-size: 0.9rem;
         color: var(--text-secondary);
         margin-bottom: 1rem;
     }
@@ -355,9 +360,301 @@
     .share-access-placeholder {
         padding: 2rem;
         text-align: center;
-        background: var(--bg-card);
+        background: var(--bg-main);
         border-radius: 6px;
         border: 1px solid var(--border);
+        display: block;
+    }
+
+    .share-access-placeholder svg {
+        display: block;
+        margin: 0 auto;
+        color: var(--accent);
+        opacity: 0.6;
+    }
+
+    /* Share Modal Styles */
+    .share-link-container {
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+
+    .share-link-url {
+        display: flex;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+
+    .share-link-url input {
+        flex: 1;
+        padding: 0.75rem;
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        font-size: 0.9rem;
+        background: var(--bg-card);
+    }
+
+    .share-link-url button {
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+    }
+
+    .share-info-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .share-info-item {
+        background: var(--bg-card);
+        padding: 0.75rem;
+        border-radius: 6px;
+        text-align: center;
+    }
+
+    .share-info-item label {
+        display: block;
+        font-size: 0.75rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.25rem;
+    }
+
+    .share-info-item span {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .share-tokens-list {
+        margin-top: 1.5rem;
+        border-top: 1px solid var(--border);
+        padding-top: 1.5rem;
+    }
+
+    .share-tokens-list h4 {
+        font-size: 0.95rem;
+        margin-bottom: 1rem;
+        color: var(--text-primary);
+    }
+
+    .share-token-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem;
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        margin-bottom: 0.5rem;
+    }
+
+    .share-token-info h5 {
+        font-size: 0.9rem;
+        margin-bottom: 0.25rem;
+    }
+
+    .share-token-info p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .share-token-status {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .share-token-status.active {
+        background: var(--success);
+        color: white;
+    }
+
+    .share-token-status.expired {
+        background: var(--danger);
+        color: white;
+    }
+
+    .share-token-status.revoked {
+        background: var(--secondary);
+        color: white;
+    }
+
+    /* Share button in action group */
+    .icon-btn.share-btn {
+        color: var(--accent);
+    }
+
+    .icon-btn.share-btn:hover {
+        background: rgba(66, 153, 225, 0.1);
+        color: var(--accent);
+    }
+
+    /* User Access button */
+    .icon-btn.access-btn {
+        color: #805ad5;
+    }
+
+    .icon-btn.access-btn:hover {
+        background: rgba(128, 90, 213, 0.1);
+        color: #805ad5;
+    }
+
+    /* User Access Modal Styles */
+    .access-list-container {
+        max-height: 300px;
+        overflow-y: auto;
+        margin-top: 1rem;
+    }
+
+    .access-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        margin-bottom: 0.75rem;
+    }
+
+    .access-item:hover {
+        border-color: var(--accent);
+    }
+
+    .access-user-info {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .access-user-avatar {
+        width: 40px;
+        height: 40px;
+        background: linear-gradient(135deg, #805ad5, #553c9a);
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+    }
+
+    .access-user-details h5 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.125rem;
+    }
+
+    .access-user-details p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .access-permissions {
+        display: flex;
+        gap: 0.5rem;
+        align-items: center;
+    }
+
+    .permission-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.7rem;
+        font-weight: 600;
+        text-transform: uppercase;
+    }
+
+    .permission-badge.view {
+        background: rgba(56, 161, 105, 0.15);
+        color: #38a169;
+    }
+
+    .permission-badge.control {
+        background: rgba(49, 130, 206, 0.15);
+        color: #3182ce;
+    }
+
+    .permission-badge.configure {
+        background: rgba(128, 90, 213, 0.15);
+        color: #805ad5;
+    }
+
+    .permission-badge.disabled {
+        background: var(--bg-main);
+        color: var(--text-secondary);
+        opacity: 0.5;
+    }
+
+    .access-status-badge {
+        padding: 0.25rem 0.5rem;
+        border-radius: 4px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .access-status-badge.active {
+        background: rgba(56, 161, 105, 0.15);
+        color: #38a169;
+    }
+
+    .access-status-badge.expired {
+        background: rgba(229, 62, 62, 0.15);
+        color: #e53e3e;
+    }
+
+    .access-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+
+    .permission-toggle-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+        margin-top: 1rem;
+    }
+
+    .permission-toggle {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 0.75rem 1rem;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+    }
+
+    .permission-toggle-info h5 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.125rem;
+    }
+
+    .permission-toggle-info p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .no-access-message {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+
+    .no-access-message svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0.75rem;
+        opacity: 0.5;
     }
 
     /* Loading Spinner */
@@ -451,20 +748,359 @@
         </div>
     </div>
 
-    <!-- Share Access Placeholder -->
+    <!-- Share Access Section -->
     <div class="share-access-section">
         <h3>
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px; flex-shrink: 0;">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
             </svg>
-            Camera Access Sharing
+            <span>Camera Stream Sharing</span>
         </h3>
-        <p>Share camera access with other users (Coming Soon)</p>
+        <p>Share camera streams with non-users for a limited time. Click the share button on any camera to generate a temporary viewing link.</p>
         <div class="share-access-placeholder">
-            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px; color: var(--text-secondary); margin: 0 auto 1rem;">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
-            </svg>
-            <p style="color: var(--text-secondary); margin: 0;">This feature will allow you to grant access to specific cameras for other users</p>
+            <div style="display: flex; flex-direction: column; align-items: center;">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px; color: var(--text-secondary); margin-bottom: 1rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                </svg>
+                <p style="color: var(--text-secondary); margin: 0;">Generate secure, time-limited share links for guests to view camera streams without requiring an account</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Camera Modal -->
+<div id="shareModal" class="modal" style="display: none;">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2>Share Camera Stream</h2>
+            <button class="modal-close" onclick="closeShareModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="shareCameraId">
+
+            <div style="background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 48px; height: 48px; background: var(--accent); border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <svg fill="none" stroke="white" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 id="shareCameraName" style="font-weight: 600; margin-bottom: 0.125rem;">Camera Name</h4>
+                        <p id="shareCameraLocation" style="font-size: 0.85rem; color: var(--text-secondary);">Location</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="shareForm">
+                <div class="form-group">
+                    <label class="form-label" for="shareName">Link Name (Optional)</label>
+                    <input type="text" id="shareName" class="form-input" placeholder="e.g., Guest Viewing">
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">A descriptive name to identify this share link</small>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label class="form-label" for="watchDuration">Watch Duration *</label>
+                        <select id="watchDuration" class="form-input" required>
+                            <option value="300">5 minutes</option>
+                            <option value="600">10 minutes</option>
+                            <option value="900">15 minutes</option>
+                            <option value="1800">30 minutes</option>
+                            <option value="3600" selected>1 hour</option>
+                            <option value="7200">2 hours</option>
+                            <option value="14400">4 hours</option>
+                            <option value="28800">8 hours</option>
+                            <option value="86400">24 hours</option>
+                        </select>
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">How long the viewer can watch once they start</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="expiresInHours">Link Valid For *</label>
+                        <select id="expiresInHours" class="form-input" required>
+                            <option value="1">1 hour</option>
+                            <option value="6">6 hours</option>
+                            <option value="12">12 hours</option>
+                            <option value="24" selected>24 hours</option>
+                            <option value="48">2 days</option>
+                            <option value="72">3 days</option>
+                            <option value="168">7 days</option>
+                        </select>
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">How long until the link expires</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="maxViews">Maximum Views (Optional)</label>
+                    <input type="number" id="maxViews" class="form-input" placeholder="Unlimited" min="1" max="100">
+                    <small style="color: var(--text-secondary); font-size: 0.8rem;">Leave empty for unlimited views</small>
+                </div>
+            </form>
+
+            <!-- Generated Link Section (hidden initially) -->
+            <div id="generatedLinkSection" style="display: none;">
+                <div class="share-link-container">
+                    <h4 style="font-size: 0.95rem; margin-bottom: 0.75rem; color: var(--success); display: flex; align-items: center; gap: 0.5rem;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                        </svg>
+                        Share Link Generated!
+                    </h4>
+                    <div class="share-link-url">
+                        <input type="text" id="generatedUrl" readonly>
+                        <button type="button" class="btn btn-primary" onclick="copyShareLink()">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                            </svg>
+                            Copy
+                        </button>
+                    </div>
+                    <div class="share-info-grid">
+                        <div class="share-info-item">
+                            <label>Watch Duration</label>
+                            <span id="shareInfoDuration">--</span>
+                        </div>
+                        <div class="share-info-item">
+                            <label>Expires</label>
+                            <span id="shareInfoExpires">--</span>
+                        </div>
+                        <div class="share-info-item">
+                            <label>Max Views</label>
+                            <span id="shareInfoViews">--</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Existing Share Tokens -->
+            <div class="share-tokens-list" id="shareTokensList" style="display: none;">
+                <h4>Active Share Links</h4>
+                <div id="shareTokensContainer">
+                    <!-- Tokens will be loaded here -->
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeShareModal()">Close</button>
+            <button type="button" class="btn btn-primary" id="generateShareBtn" onclick="generateShareLink()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                Generate Share Link
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- User Access Management Modal -->
+<div id="accessModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 700px;">
+        <div class="modal-header">
+            <h2>Manage User Access</h2>
+            <button class="modal-close" onclick="closeAccessModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="accessCameraId">
+
+            <!-- Camera Info Header -->
+            <div style="background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div style="width: 48px; height: 48px; background: #805ad5; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+                        <svg fill="none" stroke="white" viewBox="0 0 24 24" style="width: 24px; height: 24px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h4 id="accessCameraName" style="font-weight: 600; margin-bottom: 0.125rem;">Camera Name</h4>
+                        <p id="accessCameraLocation" style="font-size: 0.85rem; color: var(--text-secondary);">Location</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Grant New Access Section -->
+            <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem;">
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: #805ad5;">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+                    </svg>
+                    Grant Access to User
+                </h4>
+
+                <form id="grantAccessForm">
+                    <div class="form-group">
+                        <label class="form-label" for="accessUserId">Select User *</label>
+                        <select id="accessUserId" class="form-input" required>
+                            <option value="">-- Select a user --</option>
+                        </select>
+                    </div>
+
+                    <div class="permission-toggle-group">
+                        <div class="permission-toggle">
+                            <div class="permission-toggle-info">
+                                <h5>View</h5>
+                                <p>Can view camera stream</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="permCanView" checked>
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="permission-toggle">
+                            <div class="permission-toggle-info">
+                                <h5>Control</h5>
+                                <p>Can control camera (PTZ, zoom)</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="permCanControl">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="permission-toggle">
+                            <div class="permission-toggle-info">
+                                <h5>Configure</h5>
+                                <p>Can change camera settings</p>
+                            </div>
+                            <label class="toggle-switch">
+                                <input type="checkbox" id="permCanConfigure">
+                                <span class="toggle-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top: 1rem;">
+                        <div class="form-group">
+                            <label class="form-label" for="accessStartsAt">Access Starts (Optional)</label>
+                            <input type="datetime-local" id="accessStartsAt" class="form-input">
+                            <small style="color: var(--text-secondary); font-size: 0.8rem;">Leave empty for immediate access</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="accessExpiresAt">Access Expires (Optional)</label>
+                            <input type="datetime-local" id="accessExpiresAt" class="form-input">
+                            <small style="color: var(--text-secondary); font-size: 0.8rem;">Leave empty for permanent access</small>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" id="grantAccessBtn" style="width: 100%; margin-top: 1rem;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                        </svg>
+                        Grant Access
+                    </button>
+                </form>
+            </div>
+
+            <!-- Current Access List -->
+            <div>
+                <h4 style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between;">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 18px; height: 18px; color: var(--accent);">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+                        </svg>
+                        Users with Access
+                    </span>
+                    <span id="accessCount" style="font-size: 0.8rem; color: var(--text-secondary); font-weight: 400;">0 users</span>
+                </h4>
+
+                <div id="accessListContainer" class="access-list-container">
+                    <!-- Access list will be loaded here -->
+                    <div class="no-access-message">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                        </svg>
+                        <p>No users have access to this camera yet</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeAccessModal()">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Access Modal -->
+<div id="editAccessModal" class="modal" style="display: none;">
+    <div class="modal-content" style="max-width: 500px;">
+        <div class="modal-header">
+            <h2>Edit User Access</h2>
+            <button class="modal-close" onclick="closeEditAccessModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <input type="hidden" id="editAccessId">
+            <input type="hidden" id="editAccessCameraId">
+
+            <div style="background: var(--bg-main); padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <div id="editAccessUserAvatar" class="access-user-avatar">U</div>
+                    <div>
+                        <h4 id="editAccessUserName" style="font-weight: 600; margin-bottom: 0.125rem;">User Name</h4>
+                        <p id="editAccessUserEmail" style="font-size: 0.85rem; color: var(--text-secondary);">user@email.com</p>
+                    </div>
+                </div>
+            </div>
+
+            <form id="editAccessForm">
+                <div class="permission-toggle-group">
+                    <div class="permission-toggle">
+                        <div class="permission-toggle-info">
+                            <h5>View</h5>
+                            <p>Can view camera stream</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="editPermCanView">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="permission-toggle">
+                        <div class="permission-toggle-info">
+                            <h5>Control</h5>
+                            <p>Can control camera (PTZ, zoom)</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="editPermCanControl">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="permission-toggle">
+                        <div class="permission-toggle-info">
+                            <h5>Configure</h5>
+                            <p>Can change camera settings</p>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="editPermCanConfigure">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-row" style="margin-top: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label" for="editAccessStartsAt">Access Starts</label>
+                        <input type="datetime-local" id="editAccessStartsAt" class="form-input">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label" for="editAccessExpiresAt">Access Expires</label>
+                        <input type="datetime-local" id="editAccessExpiresAt" class="form-input">
+                        <small style="color: var(--text-secondary); font-size: 0.8rem;">Leave empty for permanent access</small>
+                    </div>
+                </div>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" onclick="closeEditAccessModal()">Cancel</button>
+            <button type="button" class="btn btn-primary" id="updateAccessBtn" onclick="updateUserAccess()">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Update Access
+            </button>
         </div>
     </div>
 </div>
@@ -762,6 +1398,16 @@
                             <td style="color: var(--text-secondary); font-size: 0.85rem;">${camera.location || '-'}</td>
                             <td>
                                 <div class="action-btn-group">
+                                    <button class="icon-btn access-btn" onclick="openAccessModal(${camera.id})" title="Manage User Access">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn share-btn" onclick="openShareModal(${camera.id})" title="Share Stream">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+                                        </svg>
+                                    </button>
                                     <button class="icon-btn" onclick="editCamera(${camera.id})" title="Edit">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
@@ -1113,6 +1759,545 @@
     document.getElementById('cameraModal').addEventListener('click', (e) => {
         if (e.target.id === 'cameraModal') {
             closeModal();
+        }
+    });
+
+    // Share Modal Functions
+    let currentShareCameraId = null;
+
+    function openShareModal(cameraId) {
+        currentShareCameraId = cameraId;
+        const camera = cameras.find(c => c.id === cameraId);
+
+        if (!camera) {
+            showAlert('Camera not found', 'error');
+            return;
+        }
+
+        // Reset form
+        document.getElementById('shareForm').reset();
+        document.getElementById('generatedLinkSection').style.display = 'none';
+        document.getElementById('shareTokensList').style.display = 'none';
+        document.getElementById('generateShareBtn').style.display = 'inline-flex';
+
+        // Set camera info
+        document.getElementById('shareCameraId').value = cameraId;
+        document.getElementById('shareCameraName').textContent = camera.name;
+        document.getElementById('shareCameraLocation').textContent = camera.location || 'No location set';
+
+        // Load existing share tokens
+        loadShareTokens(cameraId);
+
+        document.getElementById('shareModal').style.display = 'flex';
+    }
+
+    function closeShareModal() {
+        document.getElementById('shareModal').style.display = 'none';
+        currentShareCameraId = null;
+    }
+
+    async function loadShareTokens(cameraId) {
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/share-tokens`);
+
+            if (response.ok && data.share_tokens && data.share_tokens.length > 0) {
+                const container = document.getElementById('shareTokensContainer');
+                container.innerHTML = data.share_tokens.map(token => {
+                    let statusClass = 'active';
+                    let statusText = 'Active';
+
+                    if (!token.is_active) {
+                        statusClass = 'revoked';
+                        statusText = 'Revoked';
+                    } else if (!token.is_valid) {
+                        statusClass = 'expired';
+                        statusText = 'Expired';
+                    }
+
+                    return `
+                        <div class="share-token-item">
+                            <div class="share-token-info">
+                                <h5>${token.name || 'Unnamed Link'}</h5>
+                                <p>Duration: ${token.watch_duration_formatted} | Expires: ${token.expires_at_formatted}</p>
+                                <p>Views: ${token.current_views}${token.max_views ? '/' + token.max_views : ''}</p>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span class="share-token-status ${statusClass}">${statusText}</span>
+                                ${token.is_valid ? `
+                                    <button class="icon-btn" onclick="copyTokenLink('${token.share_url}')" title="Copy Link">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                        </svg>
+                                    </button>
+                                    <button class="icon-btn" onclick="revokeToken(${cameraId}, ${token.id})" title="Revoke" style="color: var(--danger);">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                        </svg>
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                document.getElementById('shareTokensList').style.display = 'block';
+            }
+        } catch (error) {
+            console.error('Error loading share tokens:', error);
+        }
+    }
+
+    async function generateShareLink() {
+        const cameraId = document.getElementById('shareCameraId').value;
+        const btn = document.getElementById('generateShareBtn');
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display: inline-block;"></span> Generating...';
+
+        const formData = {
+            name: document.getElementById('shareName').value || null,
+            watch_duration: parseInt(document.getElementById('watchDuration').value),
+            expires_in_hours: parseInt(document.getElementById('expiresInHours').value),
+            max_views: document.getElementById('maxViews').value ? parseInt(document.getElementById('maxViews').value) : null
+        };
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/share`, {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok && data.success) {
+                // Show generated link
+                document.getElementById('generatedUrl').value = data.share_token.share_url;
+                document.getElementById('shareInfoDuration').textContent = data.share_token.watch_duration_formatted;
+                document.getElementById('shareInfoExpires').textContent = data.share_token.expires_at_formatted;
+                document.getElementById('shareInfoViews').textContent = data.share_token.max_views || 'Unlimited';
+
+                document.getElementById('generatedLinkSection').style.display = 'block';
+                document.getElementById('generateShareBtn').style.display = 'none';
+
+                // Reload tokens list
+                loadShareTokens(cameraId);
+
+                showAlert('Share link generated successfully!', 'success');
+            } else {
+                showAlert(data.error || 'Failed to generate share link', 'error');
+            }
+        } catch (error) {
+            console.error('Error generating share link:', error);
+            showAlert('Error generating share link', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                </svg>
+                Generate Share Link
+            `;
+        }
+    }
+
+    function copyShareLink() {
+        const urlInput = document.getElementById('generatedUrl');
+        urlInput.select();
+        document.execCommand('copy');
+        showAlert('Share link copied to clipboard!', 'success');
+    }
+
+    function copyTokenLink(url) {
+        navigator.clipboard.writeText(url).then(() => {
+            showAlert('Share link copied to clipboard!', 'success');
+        }).catch(() => {
+            // Fallback for older browsers
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            showAlert('Share link copied to clipboard!', 'success');
+        });
+    }
+
+    async function revokeToken(cameraId, tokenId) {
+        if (!confirm('Are you sure you want to revoke this share link? This cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/share-tokens/${tokenId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showAlert('Share link revoked successfully', 'success');
+                loadShareTokens(cameraId);
+            } else {
+                showAlert(data.error || 'Failed to revoke share link', 'error');
+            }
+        } catch (error) {
+            console.error('Error revoking token:', error);
+            showAlert('Error revoking share link', 'error');
+        }
+    }
+
+    // Close share modal on outside click
+    document.getElementById('shareModal').addEventListener('click', (e) => {
+        if (e.target.id === 'shareModal') {
+            closeShareModal();
+        }
+    });
+
+    // =============================================
+    // USER ACCESS MANAGEMENT FUNCTIONS
+    // =============================================
+
+    let currentAccessCameraId = null;
+    let availableUsers = [];
+    let currentAccessList = [];
+
+    async function loadAvailableUsers() {
+        try {
+            const { response, data } = await apiCall('/admin/users/available');
+            if (response.ok && data.success) {
+                availableUsers = data.users;
+                return data.users;
+            }
+        } catch (error) {
+            console.error('Error loading available users:', error);
+        }
+        return [];
+    }
+
+    function populateUserDropdown(excludeUserIds = []) {
+        const select = document.getElementById('accessUserId');
+        select.innerHTML = '<option value="">-- Select a user --</option>';
+
+        availableUsers.forEach(user => {
+            if (!excludeUserIds.includes(user.id)) {
+                const option = document.createElement('option');
+                option.value = user.id;
+                option.textContent = `${user.name} (${user.email})`;
+                select.appendChild(option);
+            }
+        });
+    }
+
+    async function openAccessModal(cameraId) {
+        currentAccessCameraId = cameraId;
+        const camera = cameras.find(c => c.id === cameraId);
+
+        if (!camera) {
+            showAlert('Camera not found', 'error');
+            return;
+        }
+
+        // Reset form
+        document.getElementById('grantAccessForm').reset();
+        document.getElementById('permCanView').checked = true;
+        document.getElementById('permCanControl').checked = false;
+        document.getElementById('permCanConfigure').checked = false;
+
+        // Set camera info
+        document.getElementById('accessCameraId').value = cameraId;
+        document.getElementById('accessCameraName').textContent = camera.name;
+        document.getElementById('accessCameraLocation').textContent = camera.location || 'No location set';
+
+        // Load available users first
+        await loadAvailableUsers();
+
+        // Load current access list
+        await loadCameraAccessList(cameraId);
+
+        document.getElementById('accessModal').style.display = 'flex';
+    }
+
+    function closeAccessModal() {
+        document.getElementById('accessModal').style.display = 'none';
+        currentAccessCameraId = null;
+    }
+
+    async function loadCameraAccessList(cameraId) {
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/access`);
+
+            if (response.ok && data.success) {
+                currentAccessList = data.access_list;
+                renderAccessList(data.access_list);
+
+                // Update user dropdown to exclude users who already have access
+                const existingUserIds = data.access_list.map(a => a.user_id);
+                populateUserDropdown(existingUserIds);
+
+                // Update count
+                document.getElementById('accessCount').textContent = `${data.access_list.length} user${data.access_list.length !== 1 ? 's' : ''}`;
+            }
+        } catch (error) {
+            console.error('Error loading camera access list:', error);
+        }
+    }
+
+    function renderAccessList(accessList) {
+        const container = document.getElementById('accessListContainer');
+
+        if (accessList.length === 0) {
+            container.innerHTML = `
+                <div class="no-access-message">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+                    </svg>
+                    <p>No users have access to this camera yet</p>
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = accessList.map(access => {
+            const initials = access.user_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+            const statusClass = access.is_active ? 'active' : 'expired';
+            const statusText = access.is_active ? 'Active' : 'Expired';
+
+            return `
+                <div class="access-item">
+                    <div class="access-user-info">
+                        <div class="access-user-avatar">${initials}</div>
+                        <div class="access-user-details">
+                            <h5>${access.user_name}</h5>
+                            <p>${access.user_email}</p>
+                        </div>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 1rem;">
+                        <div class="access-permissions">
+                            <span class="permission-badge ${access.can_view ? 'view' : 'disabled'}" title="View">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
+                                </svg>
+                                View
+                            </span>
+                            <span class="permission-badge ${access.can_control ? 'control' : 'disabled'}" title="Control">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/>
+                                </svg>
+                                Control
+                            </span>
+                            <span class="permission-badge ${access.can_configure ? 'configure' : 'disabled'}" title="Configure">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 12px; height: 12px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                Config
+                            </span>
+                        </div>
+                        <span class="access-status-badge ${statusClass}">${statusText}</span>
+                        <div class="access-actions">
+                            <button class="icon-btn" onclick="openEditAccessModal(${access.id})" title="Edit Access">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                                </svg>
+                            </button>
+                            <button class="icon-btn" onclick="revokeUserAccess(${currentAccessCameraId}, ${access.id}, '${access.user_name}')" title="Revoke Access" style="color: var(--danger);">
+                                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    // Grant Access Form Submit
+    document.getElementById('grantAccessForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+
+        const btn = document.getElementById('grantAccessBtn');
+        const cameraId = document.getElementById('accessCameraId').value;
+        const userId = document.getElementById('accessUserId').value;
+
+        if (!userId) {
+            showAlert('Please select a user', 'error');
+            return;
+        }
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display: inline-block;"></span> Granting...';
+
+        const formData = {
+            user_id: parseInt(userId),
+            can_view: document.getElementById('permCanView').checked,
+            can_control: document.getElementById('permCanControl').checked,
+            can_configure: document.getElementById('permCanConfigure').checked,
+            access_starts_at: document.getElementById('accessStartsAt').value || null,
+            access_expires_at: document.getElementById('accessExpiresAt').value || null
+        };
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/access`, {
+                method: 'POST',
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok && data.success) {
+                showAlert(data.message || 'Access granted successfully!', 'success');
+
+                // Reset form
+                document.getElementById('grantAccessForm').reset();
+                document.getElementById('permCanView').checked = true;
+
+                // Reload access list
+                await loadCameraAccessList(cameraId);
+            } else {
+                showAlert(data.error || 'Failed to grant access', 'error');
+            }
+        } catch (error) {
+            console.error('Error granting access:', error);
+            showAlert('Error granting access', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+                </svg>
+                Grant Access
+            `;
+        }
+    });
+
+    // Edit Access Modal
+    function openEditAccessModal(accessId) {
+        const access = currentAccessList.find(a => a.id === accessId);
+        if (!access) {
+            showAlert('Access entry not found', 'error');
+            return;
+        }
+
+        // Set hidden fields
+        document.getElementById('editAccessId').value = access.id;
+        document.getElementById('editAccessCameraId').value = access.camera_id;
+
+        // Set user info
+        const initials = access.user_name.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase();
+        document.getElementById('editAccessUserAvatar').textContent = initials;
+        document.getElementById('editAccessUserName').textContent = access.user_name;
+        document.getElementById('editAccessUserEmail').textContent = access.user_email;
+
+        // Set permissions
+        document.getElementById('editPermCanView').checked = access.can_view;
+        document.getElementById('editPermCanControl').checked = access.can_control;
+        document.getElementById('editPermCanConfigure').checked = access.can_configure;
+
+        // Set dates
+        if (access.access_starts_at) {
+            // Convert to datetime-local format
+            const startsAt = new Date(access.access_starts_at.replace(' ', 'T'));
+            document.getElementById('editAccessStartsAt').value = formatDateTimeLocal(startsAt);
+        } else {
+            document.getElementById('editAccessStartsAt').value = '';
+        }
+
+        if (access.access_expires_at) {
+            const expiresAt = new Date(access.access_expires_at.replace(' ', 'T'));
+            document.getElementById('editAccessExpiresAt').value = formatDateTimeLocal(expiresAt);
+        } else {
+            document.getElementById('editAccessExpiresAt').value = '';
+        }
+
+        document.getElementById('editAccessModal').style.display = 'flex';
+    }
+
+    function closeEditAccessModal() {
+        document.getElementById('editAccessModal').style.display = 'none';
+    }
+
+    function formatDateTimeLocal(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        const hours = String(date.getHours()).padStart(2, '0');
+        const minutes = String(date.getMinutes()).padStart(2, '0');
+        return `${year}-${month}-${day}T${hours}:${minutes}`;
+    }
+
+    async function updateUserAccess() {
+        const btn = document.getElementById('updateAccessBtn');
+        const accessId = document.getElementById('editAccessId').value;
+        const cameraId = document.getElementById('editAccessCameraId').value;
+
+        btn.disabled = true;
+        btn.innerHTML = '<span class="spinner" style="display: inline-block;"></span> Updating...';
+
+        const formData = {
+            can_view: document.getElementById('editPermCanView').checked,
+            can_control: document.getElementById('editPermCanControl').checked,
+            can_configure: document.getElementById('editPermCanConfigure').checked,
+            access_starts_at: document.getElementById('editAccessStartsAt').value || null,
+            access_expires_at: document.getElementById('editAccessExpiresAt').value || null
+        };
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/access/${accessId}`, {
+                method: 'PUT',
+                body: JSON.stringify(formData)
+            });
+
+            if (response.ok && data.success) {
+                showAlert(data.message || 'Access updated successfully!', 'success');
+                closeEditAccessModal();
+
+                // Reload access list
+                await loadCameraAccessList(cameraId);
+            } else {
+                showAlert(data.error || 'Failed to update access', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating access:', error);
+            showAlert('Error updating access', 'error');
+        } finally {
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                </svg>
+                Update Access
+            `;
+        }
+    }
+
+    async function revokeUserAccess(cameraId, accessId, userName) {
+        if (!confirm(`Are you sure you want to revoke ${userName}'s access to this camera?`)) {
+            return;
+        }
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/access/${accessId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok && data.success) {
+                showAlert(data.message || 'Access revoked successfully', 'success');
+                await loadCameraAccessList(cameraId);
+            } else {
+                showAlert(data.error || 'Failed to revoke access', 'error');
+            }
+        } catch (error) {
+            console.error('Error revoking access:', error);
+            showAlert('Error revoking access', 'error');
+        }
+    }
+
+    // Close access modal on outside click
+    document.getElementById('accessModal').addEventListener('click', (e) => {
+        if (e.target.id === 'accessModal') {
+            closeAccessModal();
+        }
+    });
+
+    document.getElementById('editAccessModal').addEventListener('click', (e) => {
+        if (e.target.id === 'editAccessModal') {
+            closeEditAccessModal();
         }
     });
 </script>

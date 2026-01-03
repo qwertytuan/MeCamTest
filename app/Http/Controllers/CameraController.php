@@ -3,16 +3,18 @@
 namespace App\Http\Controllers;
 
 use App\Models\Camera;
+use App\Models\CameraShareToken;
 use Exception;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
+use Carbon\Carbon;
 
 class CameraController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('auth:api');
+        $this->middleware('auth:api')->except(['validateShareToken']);
         $this->middleware('permission:can_manage_cameras')->only(['store', 'update', 'destroy', 'toggleOnOff']);
         $this->middleware('permission:can_read')->only(['index', 'show', 'getUserCameras']);
     }
@@ -558,6 +560,221 @@ class CameraController extends Controller
 
         } catch (Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Generate a share token for non-users to watch camera stream with limited duration
+     */
+    public function generateShareToken(Request $request, string $id): JsonResponse
+    {
+        $camera = Camera::findOrFail($id);
+
+        // Check permissions
+        if (auth()->id() !== $camera->added_by && !auth()->user()->is_admin) {
+            return response()->json(['error' => 'Forbidden - Only camera owner or admin can share'], 403);
+        }
+
+        try {
+            $request->validate([
+                'name' => 'nullable|string|max:255',
+                'watch_duration' => 'required|integer|min:60|max:86400', // 1 minute to 24 hours
+                'expires_in_hours' => 'required|integer|min:1|max:168', // 1 hour to 7 days
+                'max_views' => 'nullable|integer|min:1|max:100',
+            ]);
+
+            $token = CameraShareToken::generateToken();
+            $expiresAt = Carbon::now()->addHours($request->expires_in_hours);
+
+            $shareToken = CameraShareToken::create([
+                'token' => $token,
+                'camera_id' => $camera->id,
+                'created_by' => auth()->id(),
+                'name' => $request->name,
+                'watch_duration' => $request->watch_duration,
+                'max_views' => $request->max_views,
+                'expires_at' => $expiresAt,
+                'is_active' => true,
+            ]);
+
+            // Generate the share URL
+            $shareUrl = url("/share/camera/{$token}");
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Share link generated successfully',
+                'share_token' => [
+                    'id' => $shareToken->id,
+                    'token' => $token,
+                    'name' => $shareToken->name,
+                    'share_url' => $shareUrl,
+                    'watch_duration' => $shareToken->watch_duration,
+                    'watch_duration_formatted' => $this->formatDuration($shareToken->watch_duration),
+                    'max_views' => $shareToken->max_views,
+                    'expires_at' => $expiresAt->toIso8601String(),
+                    'expires_at_formatted' => $expiresAt->format('M d, Y h:i A'),
+                ],
+                'camera' => [
+                    'id' => $camera->id,
+                    'name' => $camera->name,
+                ]
+            ], 201);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 400);
+        }
+    }
+
+    /**
+     * Get all share tokens for a camera
+     */
+    public function getShareTokens(string $id): JsonResponse
+    {
+        $camera = Camera::findOrFail($id);
+
+        if (auth()->id() !== $camera->added_by && !auth()->user()->is_admin) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        $tokens = CameraShareToken::where('camera_id', $id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($token) {
+                return [
+                    'id' => $token->id,
+                    'token' => $token->token,
+                    'name' => $token->name,
+                    'share_url' => url("/share/camera/{$token->token}"),
+                    'watch_duration' => $token->watch_duration,
+                    'watch_duration_formatted' => $this->formatDuration($token->watch_duration),
+                    'max_views' => $token->max_views,
+                    'current_views' => $token->current_views,
+                    'expires_at' => $token->expires_at->toIso8601String(),
+                    'expires_at_formatted' => $token->expires_at->format('M d, Y h:i A'),
+                    'first_accessed_at' => $token->first_accessed_at?->toIso8601String(),
+                    'is_active' => $token->is_active,
+                    'is_valid' => $token->isValid(),
+                    'created_at' => $token->created_at->toIso8601String(),
+                ];
+            });
+
+        return response()->json([
+            'success' => true,
+            'camera_id' => $id,
+            'share_tokens' => $tokens,
+        ]);
+    }
+
+    /**
+     * Revoke (deactivate) a share token
+     */
+    public function revokeShareToken(string $cameraId, string $tokenId): JsonResponse
+    {
+        $camera = Camera::findOrFail($cameraId);
+
+        if (auth()->id() !== $camera->added_by && !auth()->user()->is_admin) {
+            return response()->json(['error' => 'Forbidden'], 403);
+        }
+
+        $shareToken = CameraShareToken::where('id', $tokenId)
+            ->where('camera_id', $cameraId)
+            ->firstOrFail();
+
+        $shareToken->deactivate();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Share token revoked successfully',
+        ]);
+    }
+
+    /**
+     * Validate a share token and return camera stream info for public access
+     * This endpoint does not require authentication
+     */
+    public function validateShareToken(string $token): JsonResponse
+    {
+        $shareToken = CameraShareToken::where('token', $token)->first();
+
+        if (!$shareToken) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Invalid share link',
+            ], 404);
+        }
+
+        if (!$shareToken->isValid()) {
+            $reason = 'Share link has expired';
+            if (!$shareToken->is_active) {
+                $reason = 'Share link has been revoked';
+            } elseif ($shareToken->max_views && $shareToken->current_views >= $shareToken->max_views) {
+                $reason = 'Maximum view limit reached';
+            }
+
+            return response()->json([
+                'success' => false,
+                'error' => $reason,
+            ], 403);
+        }
+
+        // Check if watch duration has expired (only if previously accessed)
+        if ($shareToken->hasWatchDurationExpired()) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Watch duration has expired',
+            ], 403);
+        }
+
+        // Record access if this is the first time
+        $isFirstAccess = !$shareToken->first_accessed_at;
+        $shareToken->recordAccess();
+
+        $camera = $shareToken->camera;
+
+        // Check if camera is active and has a stream
+        if (!$camera->is_active || !$camera->websocket_url) {
+            return response()->json([
+                'success' => false,
+                'error' => 'Camera stream is not currently available',
+            ], 503);
+        }
+
+        return response()->json([
+            'success' => true,
+            'camera' => [
+                'id' => $camera->id,
+                'name' => $camera->name,
+                'websocket_url' => $camera->websocket_url,
+                'resolution' => $camera->resolution,
+            ],
+            'share_info' => [
+                'name' => $shareToken->name,
+                'watch_duration' => $shareToken->watch_duration,
+                'remaining_time' => $shareToken->getRemainingWatchTime(),
+                'watch_end_timestamp' => $shareToken->getWatchEndTimestamp()?->toIso8601String(),
+                'first_access' => $isFirstAccess,
+            ],
+        ]);
+    }
+
+    /**
+     * Format duration in seconds to human-readable format
+     */
+    private function formatDuration(int $seconds): string
+    {
+        if ($seconds < 60) {
+            return "{$seconds} seconds";
+        } elseif ($seconds < 3600) {
+            $minutes = floor($seconds / 60);
+            return "{$minutes} minute" . ($minutes > 1 ? 's' : '');
+        } else {
+            $hours = floor($seconds / 3600);
+            $minutes = floor(($seconds % 3600) / 60);
+            $result = "{$hours} hour" . ($hours > 1 ? 's' : '');
+            if ($minutes > 0) {
+                $result .= " {$minutes} min";
+            }
+            return $result;
         }
     }
 }

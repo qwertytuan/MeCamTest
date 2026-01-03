@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Notifications\Notifiable;
 use App\Models\VideoRecording;
 use App\Models\ThumbnailImage;
+use App\Models\CameraShareToken;
 
 class Camera extends Model
 {
@@ -64,5 +65,15 @@ class Camera extends Model
     public function thumbnails(): HasMany
     {
         return $this->hasMany(ThumbnailImage::class);
+    }
+
+    public function shareTokens(): HasMany
+    {
+        return $this->hasMany(CameraShareToken::class);
+    }
+
+    public function activeShareTokens(): HasMany
+    {
+        return $this->hasMany(CameraShareToken::class)->where('is_active', true)->where('expires_at', '>', now());
     }
 }
