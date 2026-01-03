@@ -1,0 +1,286 @@
+<mxfile host="app.diagrams.net" modified="2026-01-02T00:00:00.000Z" agent="Mozilla/5.0" version="22.0.0" etag="camera-system-usecase">
+  <diagram id="camera-usecase-diagram" name="Camera System Use Case">
+    <mxGraphModel dx="1422" dy="794" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- System Boundary -->
+        <mxCell id="system-boundary" value="Camera Management System" style="rounded=0;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#000000;strokeWidth=2;dashed=0;verticalAlign=top;fontStyle=1;fontSize=14;" parent="1" vertex="1">
+          <mxGeometry x="200" y="40" width="750" height="700" as="geometry" />
+        </mxCell>
+
+        <!-- Actors -->
+        <!-- Regular User Actor -->
+        <mxCell id="actor-user" value="User" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="60" y="300" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Admin Actor (User with Admin Role) -->
+        <mxCell id="actor-admin" value="Admin&#xa;(User with Admin Role)" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="1030" y="300" width="40" height="80" as="geometry" />
+        </mxCell>
+
+        <!-- Authentication Use Cases -->
+        <mxCell id="uc-login" value="Login" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="250" y="70" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-logout" value="Logout" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="400" y="70" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-register" value="Register" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="550" y="70" width="120" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Camera Management Use Cases -->
+        <mxCell id="uc-view-cameras" value="View Cameras" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="280" y="160" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-add-camera" value="Add Camera" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="160" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-edit-camera" value="Edit Camera" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="230" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-delete-camera" value="Delete Camera" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="300" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Stream Use Cases -->
+        <mxCell id="uc-view-stream" value="View Live Stream" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="280" y="230" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-start-stream" value="Start Stream" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="370" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-stop-stream" value="Stop Stream" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="440" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Detection Use Cases -->
+        <mxCell id="uc-configure-detection" value="Configure Detection&#xa;Settings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="450" y="300" width="150" height="60" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-motion-detection" value="Enable Motion&#xa;Detection" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="280" y="380" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-human-detection" value="Enable Human&#xa;Detection" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="450" y="380" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-combined-detection" value="Enable Motion+Human&#xa;Detection" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="360" y="450" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Recording Use Cases -->
+        <mxCell id="uc-view-recordings" value="View Recordings" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="280" y="520" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-download-recording" value="Download Recording" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="280" y="590" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-auto-record" value="Auto Record on&#xa;Detection" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="450" y="520" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Thumbnail Use Cases -->
+        <mxCell id="uc-view-thumbnails" value="View Thumbnails" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="280" y="660" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-capture-thumbnail" value="Capture Thumbnail" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="510" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-auto-thumbnail" value="Auto Thumbnail on&#xa;Detection" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="450" y="590" width="150" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- Admin-Only Use Cases -->
+        <mxCell id="uc-manage-users" value="Manage Users" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="580" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-assign-roles" value="Assign Roles" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="700" y="650" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <mxCell id="uc-grant-access" value="Grant Camera Access" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="530" y="160" width="130" height="50" as="geometry" />
+        </mxCell>
+
+        <!-- User Connections -->
+        <mxCell id="conn-user-login" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-login" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-logout" style="endArrow=none;html=1;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-logout" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-view-cameras" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-view-cameras" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-view-stream" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-view-stream" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-view-recordings" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-view-recordings" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-download" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-download-recording" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-user-thumbnails" style="endArrow=none;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-user" target="uc-view-thumbnails" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Admin Connections -->
+        <mxCell id="conn-admin-login" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-register" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-add-camera" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-add-camera" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-edit-camera" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-edit-camera" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-delete-camera" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-delete-camera" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-start-stream" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-start-stream" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-stop-stream" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-stop-stream" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-capture-thumb" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-capture-thumbnail" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-manage-users" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-manage-users" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-assign-roles" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-assign-roles" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-grant-access" style="endArrow=none;html=1;exitX=0;exitY=0.3;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-grant-access" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="conn-admin-detection" style="endArrow=none;html=1;exitX=0;exitY=0.5;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="actor-admin" target="uc-configure-detection" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Include Relationships -->
+        <mxCell id="include-detection-motion" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="uc-configure-detection" target="uc-motion-detection" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="include-detection-human" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="uc-configure-detection" target="uc-human-detection" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="include-detection-combined" value="&lt;&lt;include&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="uc-human-detection" target="uc-combined-detection" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Extend Relationships -->
+        <mxCell id="extend-motion-record" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="uc-motion-detection" target="uc-auto-record" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="extend-human-record" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="uc-human-detection" target="uc-auto-record" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <mxCell id="extend-detection-thumbnail" value="&lt;&lt;extend&gt;&gt;" style="endArrow=open;html=1;dashed=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="uc-auto-record" target="uc-auto-thumbnail" edge="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Legend -->
+        <mxCell id="legend-box" value="" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;" parent="1" vertex="1">
+          <mxGeometry x="10" y="560" width="180" height="180" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-title" value="Legend" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1" parent="1" vertex="1">
+          <mxGeometry x="70" y="565" width="60" height="20" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-user" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+          <mxGeometry x="20" y="590" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-user-text" value="User Use Case" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="590" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-admin" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+          <mxGeometry x="20" y="610" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-admin-text" value="Admin Use Case" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="610" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-detection" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+          <mxGeometry x="20" y="630" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-detection-text" value="Detection Feature" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="630" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-auto" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+          <mxGeometry x="20" y="650" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-auto-text" value="Auto-triggered" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="650" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-config" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+          <mxGeometry x="20" y="670" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-config-text" value="Configuration" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="670" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-auth" value="" style="ellipse;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+          <mxGeometry x="20" y="690" width="20" height="15" as="geometry" />
+        </mxCell>
+        <mxCell id="legend-auth-text" value="Authentication" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="45" y="690" width="90" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-include" value="- - - → &lt;&lt;include&gt;&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="20" y="710" width="100" height="15" as="geometry" />
+        </mxCell>
+
+        <mxCell id="legend-extend" value="- - - → &lt;&lt;extend&gt;&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=10" parent="1" vertex="1">
+          <mxGeometry x="110" y="710" width="80" height="15" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
+

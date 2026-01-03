@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Stream Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #555;
+        }
+        input, select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 20px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        canvas {
+            border: 2px solid #ddd;
+            border-radius: 4px;
+            max-width: 100%;
+            display: block;
+        }
+        .status {
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .status.info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+        }
+        .camera-list {
+            list-style: none;
+            padding: 0;
+        }
+        .camera-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+        }
+        .camera-item strong {
+            color: #007bff;
+        }
+        #authFields {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎥 Camera Stream Server - Test Interface</h1>
+
+    <div class="container">
+        <h2>Initialize Camera</h2>
+        <div class="form-group">
+            <label for="connectionType">Connection Type:</label>
+            <select id="connectionType" onchange="toggleAuthFields()">
+                <option value="USB">USB Camera</option>
+                <option value="STREAM">RTSP Stream</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="cameraId">Camera ID (Unique):</label>
+            <input type="text" id="cameraId" placeholder="e.g. 1, 101, cam_front">
+        </div>
+
+        <div class="form-group">
+            <label for="cameraConnectionPath">Camera Connection Path:</label>
+            <input type="text" id="cameraConnectionPath" placeholder="/dev/video0 or 192.168.1.100:554/stream1">
+            <small style="color: #666; display: block; margin-top: 5px;">
+                For USB: /dev/video0, /dev/video1, etc.<br>
+                For RTSP: IP:PORT/PATH or full rtsp:// URL
+            </small>
+        </div>
+
+        <div id="authFields">
+            <div class="form-group">
+                <label for="username">Username (optional for RTSP):</label>
+                <input type="text" id="username" placeholder="admin">
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password (optional for RTSP):</label>
+                <input type="password" id="password" placeholder="password123">
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="initializeCamera()">Initialize Camera</button>
+        <button class="btn-success" onclick="listCameras()">List Active Cameras</button>
+        <button class="btn-danger" onclick="stopCurrentCamera()">Stop Current Camera</button>
+
+        <div id="initStatus"></div>
+    </div>
+
+    <div class="container">
+        <h2>Active Cameras</h2>
+        <ul id="cameraList" class="camera-list">
+            <li style="color: #999;">No cameras initialized yet</li>
+        </ul>
+    </div>
+
+    <div class="container">
+        <h2>Live Stream</h2>
+        <canvas id="streamCanvas" width="640" height="480"></canvas>
+        <div id="streamStatus" class="status info">Stream not connected</div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentStreamId = null;
+        const canvas = document.getElementById('streamCanvas');
+        const ctx = canvas.getContext('2d');
+
+        function toggleAuthFields() {
+            const connectionType = document.getElementById('connectionType').value;
+            const authFields = document.getElementById('authFields');
+            authFields.style.display = connectionType === 'STREAM' ? 'block' : 'none';
+        }
+
+        async function initializeCamera() {
+            const connectionType = document.getElementById('connectionType').value;
+            const cameraId = document.getElementById('cameraId').value;
+            const cameraConnectionPath = document.getElementById('cameraConnectionPath').value;
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const statusDiv = document.getElementById('initStatus');
+
+            if (!cameraId) {
+                statusDiv.innerHTML = '<div class="status error">Please enter a camera ID (Unique)</div>';
+                return;
+            }
+            if (!cameraConnectionPath) {
+                statusDiv.innerHTML = '<div class="status error">Please enter a camera connection path</div>';
+                return;
+            }
+
+            statusDiv.innerHTML = '<div class="status info">Initializing camera...</div>';
+
+            try {
+                const payload = {
+                    camera_id: cameraId,
+                    camera_connection_path: cameraConnectionPath,
+                    connection_type: connectionType
+                };
+
+                if (connectionType === 'STREAM') {
+                    if (username) payload.username = username;
+                    if (password) payload.password = password;
+                }
+
+                const response = await fetch('http://localhost:5000/api/camera/init', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    currentStreamId = data.stream_id;
+                    statusDiv.innerHTML = `
+                        <div class="status success">
+                            ✓ Camera initialized successfully!<br>
+                            Stream ID: ${data.stream_id}<br>
+                            Camera ID: ${data.camera_info.camera_id}<br>
+                            Resolution: ${data.camera_info.width}x${data.camera_info.height}<br>
+                            FPS: ${data.camera_info.fps}
+                        </div>
+                    `;
+
+                    // Automatically connect to WebSocket
+                    connectWebSocket(data.stream_id);
+
+                    // Refresh camera list
+                    listCameras();
+                } else {
+                    statusDiv.innerHTML = `<div class="status error">✗ Error: ${data.error}</div>`;
+                }
+            } catch (error) {
+                statusDiv.innerHTML = `<div class="status error">✗ Error: ${error.message}</div>`;
+            }
+        }
+
+        function connectWebSocket(streamId) {
+            // Close existing connection
+            if (ws) {
+                ws.close();
+            }
+
+            const streamStatus = document.getElementById('streamStatus');
+            streamStatus.textContent = 'Connecting to stream...';
+            streamStatus.className = 'status info';
+
+            ws = new WebSocket(`ws://localhost:5000/stream/${streamId}`);
+            ws.binaryType = 'arraybuffer';
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                streamStatus.textContent = '✓ Connected - Streaming...';
+                streamStatus.className = 'status success';
+            };
+
+            ws.onmessage = (event) => {
+                const blob = new Blob([event.data], { type: 'image/jpeg' });
+                const url = URL.createObjectURL(blob);
+                const img = new Image();
+
+                img.onload = () => {
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    URL.revokeObjectURL(url);
+                };
+
+                img.src = url;
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+                streamStatus.textContent = '✗ Connection error';
+                streamStatus.className = 'status error';
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket closed');
+                streamStatus.textContent = 'Connection closed';
+                streamStatus.className = 'status info';
+            };
+        }
+
+        async function listCameras() {
+            const listElement = document.getElementById('cameraList');
+
+            try {
+                const response = await fetch('http://localhost:5000/api/camera/list');
+                const data = await response.json();
+
+                if (data.success && data.cameras.length > 0) {
+                    listElement.innerHTML = data.cameras.map(cam => `
+                        <li class="camera-item">
+                            <strong>${cam.camera_id}</strong> (${cam.connection_type})<br>
+                            Path: ${cam.camera_connection_path}<br>
+                            Stream ID: ${cam.stream_id}<br>
+                            Resolution: ${cam.width}x${cam.height} @ ${cam.fps} FPS<br>
+                            Status: ${cam.status}<br>
+                            <button class="btn-primary" style="margin-top: 5px;" onclick="connectWebSocket('${cam.stream_id}')">
+                                Connect
+                            </button>
+                            <button class="btn-danger" style="margin-top: 5px;" onclick="stopCamera('${cam.stream_id}')">
+                                Stop
+                            </button>
+                        </li>
+                    `).join('');
+                } else {
+                    listElement.innerHTML = '<li style="color: #999;">No cameras initialized yet</li>';
+                }
+            } catch (error) {
+                listElement.innerHTML = `<li style="color: red;">Error: ${error.message}</li>`;
+            }
+        }
+
+        async function stopCamera(streamId) {
+            try {
+                const response = await fetch(`http://localhost:5000/api/camera/stop/${streamId}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    if (currentStreamId === streamId) {
+                        currentStreamId = null;
+                        if (ws) ws.close();
+                    }
+                    alert('Camera stopped successfully');
+                    listCameras();
+                } else {
+                    alert('Error: ' + data.error);
+                }
+            } catch (error) {
+                alert('Error: ' + error.message);
+            }
+        }
+
+        function stopCurrentCamera() {
+            if (currentStreamId) {
+                stopCamera(currentStreamId);
+            } else {
+                alert('No camera is currently active');
+            }
+        }
+
+        // Auto-refresh camera list every 5 seconds
+        setInterval(listCameras, 5000);
+
+        // Initial load
+        listCameras();
+    </script>
+</body>
+</html>

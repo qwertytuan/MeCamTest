@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camera Live Stream Dashboard</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <header class="dashboard-header">
+        <h1>📹 Camera Live Stream Dashboard</h1>
+        <div class="header-controls">
+            <span id="connection-status" class="status-indicator">
+                <span class="status-dot"></span> Connecting...
+            </span>
+        </div>
+    </header>
+
+    <main id="players-container">
+        <div class="loading-state">
+            <div class="spinner"></div>
+            <p>Loading cameras...</p>
+        </div>
+    </main>
+
+    <!-- Fullscreen Modal -->
+    <div id="fullscreen-modal" class="fullscreen-modal">
+        <div class="fullscreen-header">
+            <h3 id="fullscreen-title">Camera Stream</h3>
+            <div class="fullscreen-controls-header">
+                <button class="control-btn" onclick="captureFullscreenFrame()" title="Capture Frame">
+                    📷
+                </button>
+                <button class="control-btn danger" onclick="closeFullscreen()" title="Close">
+                    ✕
+                </button>
+            </div>
+        </div>
+        <div class="fullscreen-content">
+            <canvas id="fullscreen-canvas"></canvas>
+            <div id="fullscreen-detection-alert" class="detection-alert-fullscreen">
+                ⚠️ <span id="fullscreen-alert-text">Detection Alert</span>
+            </div>
+        </div>
+        <div class="fullscreen-footer">
+            <button class="fullscreen-btn" onclick="captureFullscreenFrame()">
+                📷 Capture Frame
+            </button>
+            <button class="fullscreen-btn" onclick="viewRecordingsFullscreen()">
+                🎬 View Recordings
+            </button>
+            <button class="fullscreen-btn" onclick="closeFullscreen()">
+                ✕ Exit Fullscreen
+            </button>
+        </div>
+    </div>
+
+    <!-- Recordings Modal -->
+    <div id="recordings-modal" class="recordings-modal">
+        <div class="recordings-content">
+            <div class="recordings-header">
+                <h3 id="recordings-title">Camera Recordings</h3>
+                <button class="close-btn" onclick="closeRecordingsModal()">✕</button>
+            </div>
+            <div id="recordings-list" class="recordings-list">
+                <!-- Recordings will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Video Player Modal -->
+    <div id="video-modal" class="video-modal">
+        <div class="video-content">
+            <div class="video-header">
+                <span id="video-title">Recording Playback</span>
+                <button class="close-btn" onclick="closeVideoModal()">✕</button>
+            </div>
+            <video id="recording-player" controls>
+                Your browser does not support the video tag.
+            </video>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast"></div>
+
+    <script type="text/javascript" src="{{ url_for('static', filename='websocket.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,411 @@
+-- ============================================
+-- CAMERA SYSTEM DATABASE SCHEMA (OPTIMIZED)
+-- ============================================
+-- Removed Admin table, using RBAC (Role-Based Access Control)
+-- Added detection_type to Camera for motion/human detection
+-- Added VideoRecording table for detection-triggered recordings
+-- Added ThumbnailImage table for camera thumbnails
+-- ============================================
+
+SET default_storage_engine=InnoDB;
+SET NAMES utf8mb4;
+SET CHARACTER SET utf8mb4;
+
+---------------------------------------------------
+-- Table 1: User (RBAC-based, no separate Admin table)
+---------------------------------------------------
+CREATE TABLE User (
+    user_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    email VARCHAR(100) UNIQUE,
+    full_name VARCHAR(100),
+    avatar_url VARCHAR(500),
+    is_active BOOLEAN DEFAULT 1,
+    email_verified_at TIMESTAMP NULL,
+    remember_token VARCHAR(100),
+    deleted_at TIMESTAMP NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_is_active (is_active),
+    INDEX idx_deleted_at (deleted_at),
+    INDEX idx_email (email)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 2: Role
+---------------------------------------------------
+CREATE TABLE Role (
+    role_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(50) NOT NULL UNIQUE,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    INDEX idx_name (name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 3: Permission
+---------------------------------------------------
+CREATE TABLE Permission (
+    permission_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    role_id INT UNSIGNED NOT NULL,
+    can_create BOOLEAN DEFAULT 0,
+    can_read BOOLEAN DEFAULT 1,
+    can_update BOOLEAN DEFAULT 0,
+    can_delete BOOLEAN DEFAULT 0,
+    can_manage_users BOOLEAN DEFAULT 0,
+    can_manage_roles BOOLEAN DEFAULT 0,
+    can_manage_permissions BOOLEAN DEFAULT 0,
+    can_manage_cameras BOOLEAN DEFAULT 0,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (role_id) REFERENCES Role(role_id) ON DELETE CASCADE,
+
+    UNIQUE KEY unique_role_permission (role_id),
+    INDEX idx_role_id (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 4: UserRole (Many-to-Many: User <-> Role)
+---------------------------------------------------
+CREATE TABLE UserRole (
+    user_role_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNSIGNED NOT NULL,
+    role_id INT UNSIGNED NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES Role(role_id) ON DELETE CASCADE,
+
+    UNIQUE KEY unique_user_role (user_id, role_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_role_id (role_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 5: Camera (with detection_type)
+---------------------------------------------------
+CREATE TABLE Camera (
+    camera_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    type ENUM('USB', 'STREAM') NOT NULL,
+    usb_device_path VARCHAR(255),
+    stream_url VARCHAR(500),
+    stream_username VARCHAR(100),
+    stream_password VARCHAR(255),
+    websocket_url VARCHAR(500),
+    location VARCHAR(100),
+    description TEXT,
+    is_online BOOLEAN DEFAULT 1,
+    is_active BOOLEAN DEFAULT 1,
+    resolution VARCHAR(20) DEFAULT '1920x1080',
+    fps INT DEFAULT 30,
+
+    -- Detection Settings
+    detection_type ENUM('NONE', 'MOTION', 'HUMAN', 'MOTION_HUMAN') DEFAULT 'NONE',
+    detection_enabled BOOLEAN DEFAULT 0,
+    detection_sensitivity INT DEFAULT 50,  -- 1-100 scale
+
+    -- Recording Settings
+    recording_duration INT DEFAULT 180,  -- seconds (default 3 minutes)
+    pre_record_buffer INT DEFAULT 10,    -- seconds before detection
+
+    -- Thumbnail Settings
+    thumbnail_enabled BOOLEAN DEFAULT 1,
+    thumbnail_interval INT DEFAULT 60,   -- seconds between thumbnail captures
+
+    added_by_user_id INT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (added_by_user_id) REFERENCES User(user_id) ON DELETE SET NULL,
+
+    INDEX idx_type (type),
+    INDEX idx_is_online (is_online),
+    INDEX idx_is_active (is_active),
+    INDEX idx_detection_type (detection_type),
+    INDEX idx_detection_enabled (detection_enabled),
+    INDEX idx_added_by_user_id (added_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 6: UserCameraAccess
+---------------------------------------------------
+CREATE TABLE UserCameraAccess (
+    access_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNSIGNED NOT NULL,
+    camera_id INT UNSIGNED NOT NULL,
+    access_starts_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    access_expires_at DATETIME,
+    can_view BOOLEAN DEFAULT 1,
+    can_control BOOLEAN DEFAULT 0,
+    can_configure BOOLEAN DEFAULT 0,
+    granted_by_user_id INT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+    FOREIGN KEY (granted_by_user_id) REFERENCES User(user_id) ON DELETE SET NULL,
+
+    UNIQUE KEY unique_user_camera (user_id, camera_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_granted_by_user_id (granted_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 7: UserCameraSettings
+---------------------------------------------------
+CREATE TABLE UserCameraSettings (
+    setting_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    user_id INT UNSIGNED NOT NULL,
+    camera_id INT UNSIGNED NOT NULL,
+    notification_enabled BOOLEAN DEFAULT 1,
+    motion_detection_enabled BOOLEAN DEFAULT 1,
+    recording_enabled BOOLEAN DEFAULT 0,
+    quality_preference ENUM('LOW', 'MEDIUM', 'HIGH') DEFAULT 'MEDIUM',
+    custom_overlay_text VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE CASCADE,
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+
+    UNIQUE KEY unique_user_camera_settings (user_id, camera_id),
+    INDEX idx_user_id (user_id),
+    INDEX idx_camera_id (camera_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 8: VideoRecording (Detection-triggered recordings)
+---------------------------------------------------
+CREATE TABLE VideoRecording (
+    recording_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    camera_id INT UNSIGNED NOT NULL,
+
+    -- Recording Info
+    file_path VARCHAR(500) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_size BIGINT UNSIGNED DEFAULT 0,  -- bytes
+    duration INT DEFAULT 0,               -- seconds
+
+    -- Detection Info
+    detection_type ENUM('MOTION', 'HUMAN', 'MOTION_HUMAN', 'MANUAL') NOT NULL,
+    triggered_at TIMESTAMP NOT NULL,
+
+    -- Metadata
+    resolution VARCHAR(20),
+    fps INT,
+    codec VARCHAR(50) DEFAULT 'H264',
+
+    -- Status
+    status ENUM('RECORDING', 'COMPLETED', 'FAILED', 'DELETED') DEFAULT 'RECORDING',
+    error_message TEXT,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_detection_type (detection_type),
+    INDEX idx_triggered_at (triggered_at),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 9: ThumbnailImage
+---------------------------------------------------
+CREATE TABLE ThumbnailImage (
+    thumbnail_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    camera_id INT UNSIGNED NOT NULL,
+
+    -- Thumbnail Info
+    file_path VARCHAR(500) NOT NULL,
+    file_name VARCHAR(255) NOT NULL,
+    file_size INT UNSIGNED DEFAULT 0,  -- bytes
+
+    -- Image Properties
+    width INT DEFAULT 320,
+    height INT DEFAULT 240,
+
+    -- Detection Info (if captured due to detection)
+    is_detection_thumbnail BOOLEAN DEFAULT 0,
+    detection_type ENUM('NONE', 'MOTION', 'HUMAN') DEFAULT 'NONE',
+    recording_id BIGINT UNSIGNED NULL,
+
+    captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+    FOREIGN KEY (recording_id) REFERENCES VideoRecording(recording_id) ON DELETE SET NULL,
+
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_captured_at (captured_at),
+    INDEX idx_is_detection_thumbnail (is_detection_thumbnail),
+    INDEX idx_recording_id (recording_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 10: AIModel
+---------------------------------------------------
+CREATE TABLE AIModel (
+    model_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    name VARCHAR(100) NOT NULL UNIQUE,
+    version VARCHAR(20) NOT NULL,
+    type ENUM('YOLO', 'OTHER') DEFAULT 'YOLO',
+    description TEXT,
+    config_json JSON,
+    is_active BOOLEAN DEFAULT 1,
+    created_by_user_id INT UNSIGNED,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (created_by_user_id) REFERENCES User(user_id) ON DELETE SET NULL,
+
+    INDEX idx_type (type),
+    INDEX idx_is_active (is_active),
+    INDEX idx_created_by_user_id (created_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 11: CameraAIModel
+---------------------------------------------------
+CREATE TABLE CameraAIModel (
+    camera_ai_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    camera_id INT UNSIGNED NOT NULL,
+    model_id INT UNSIGNED NOT NULL,
+    is_enabled BOOLEAN DEFAULT 0,
+    requested_by_user_id INT UNSIGNED,
+    confidence_threshold DECIMAL(3,2) DEFAULT 0.50,
+    detection_zones JSON,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+    FOREIGN KEY (model_id) REFERENCES AIModel(model_id) ON DELETE CASCADE,
+    FOREIGN KEY (requested_by_user_id) REFERENCES User(user_id) ON DELETE SET NULL,
+
+    UNIQUE KEY unique_camera_model (camera_id, model_id),
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_model_id (model_id),
+    INDEX idx_is_enabled (is_enabled),
+    INDEX idx_requested_by_user_id (requested_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 12: StreamShare
+---------------------------------------------------
+CREATE TABLE StreamShare (
+    share_id INT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    camera_id INT UNSIGNED NOT NULL,
+    shared_by_user_id INT UNSIGNED NOT NULL,
+    share_token VARCHAR(255) NOT NULL UNIQUE,
+    share_url VARCHAR(500) NOT NULL,
+    expires_at DATETIME,
+    is_active BOOLEAN DEFAULT 1,
+    access_count INT DEFAULT 0,
+    max_access_count INT DEFAULT -1,
+    allowed_ips TEXT,
+    require_password BOOLEAN DEFAULT 0,
+    share_password_hash VARCHAR(255),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+    FOREIGN KEY (shared_by_user_id) REFERENCES User(user_id) ON DELETE CASCADE,
+
+    INDEX idx_share_token (share_token),
+    INDEX idx_is_active (is_active),
+    INDEX idx_expires_at (expires_at),
+    INDEX idx_shared_by_user_id (shared_by_user_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 13: ActivityLog
+---------------------------------------------------
+CREATE TABLE ActivityLog (
+    log_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    user_id INT UNSIGNED,
+    camera_id INT UNSIGNED,
+    action_type ENUM(
+        'LOGIN', 'LOGOUT', 'VIEW_STREAM', 'CONTROL_CAMERA', 'ADD_CAMERA',
+        'UPDATE_CAMERA', 'DELETE_CAMERA', 'GRANT_ACCESS', 'REVOKE_ACCESS',
+        'SHARE_STREAM', 'ENABLE_AI', 'DISABLE_AI', 'DETECTION_TRIGGERED',
+        'SETTINGS_CHANGED', 'ROLE_ASSIGNED', 'ROLE_REVOKED',
+        'PERMISSION_CHANGED', 'USER_CREATED', 'USER_UPDATED', 'USER_DELETED',
+        'RECORDING_STARTED', 'RECORDING_STOPPED', 'THUMBNAIL_CAPTURED',
+        'DETECTION_ENABLED', 'DETECTION_DISABLED'
+    ) NOT NULL,
+    description TEXT,
+    ip_address VARCHAR(45),
+    user_agent TEXT,
+    metadata JSON,
+
+    INDEX idx_timestamp (timestamp),
+    INDEX idx_user_id (user_id),
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_action_type (action_type),
+
+    FOREIGN KEY (user_id) REFERENCES User(user_id) ON DELETE SET NULL,
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- Table 14: DetectionEvent
+---------------------------------------------------
+CREATE TABLE DetectionEvent (
+    event_id BIGINT UNSIGNED PRIMARY KEY AUTO_INCREMENT,
+    camera_id INT UNSIGNED NOT NULL,
+    model_id INT UNSIGNED,
+
+    -- Detection Details
+    detection_type ENUM('MOTION', 'HUMAN') NOT NULL,
+    detected_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    confidence DECIMAL(3,2),
+    object_class VARCHAR(100),
+    bounding_box JSON,
+    snapshot_path VARCHAR(500),
+
+    -- Associated Recording
+    recording_id BIGINT UNSIGNED,
+
+    -- Notification Status
+    notified BOOLEAN DEFAULT 0,
+    notified_at TIMESTAMP NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+    FOREIGN KEY (camera_id) REFERENCES Camera(camera_id) ON DELETE CASCADE,
+    FOREIGN KEY (model_id) REFERENCES AIModel(model_id) ON DELETE SET NULL,
+    FOREIGN KEY (recording_id) REFERENCES VideoRecording(recording_id) ON DELETE SET NULL,
+
+    INDEX idx_camera_id (camera_id),
+    INDEX idx_detection_type (detection_type),
+    INDEX idx_detected_at (detected_at),
+    INDEX idx_object_class (object_class),
+    INDEX idx_confidence (confidence),
+    INDEX idx_recording_id (recording_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+---------------------------------------------------
+-- DEFAULT DATA: Roles and Permissions
+---------------------------------------------------
+INSERT INTO Role (name, description) VALUES
+    ('admin', 'Administrator with full system access'),
+    ('user', 'Regular user with limited access'),
+    ('viewer', 'Can only view assigned cameras');
+
+INSERT INTO Permission (role_id, can_create, can_read, can_update, can_delete, can_manage_users, can_manage_roles, can_manage_permissions, can_manage_cameras) VALUES
+    (1, 1, 1, 1, 1, 1, 1, 1, 1),  -- admin: full access
+    (2, 0, 1, 0, 0, 0, 0, 0, 0),  -- user: read only
+    (3, 0, 1, 0, 0, 0, 0, 0, 0);  -- viewer: read only
+

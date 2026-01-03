@@ -1,0 +1,5 @@
+Frontend:
++ Vuejs: https://vuejs.org/ 
++ tailwindcss: https://tailwindcss.com/
+Backend: python flask , mariadb, jwt auth
+Tự host web, thêm điện thoại android như camera
