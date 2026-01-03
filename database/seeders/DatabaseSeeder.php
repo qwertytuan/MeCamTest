@@ -234,7 +234,7 @@ class DatabaseSeeder extends Seeder
 
         // Additional cameras with factory for variety
         $factoryCameras = Camera::factory()->count(4)->create();
-        
+
         return array_merge($cameras, $factoryCameras->all());
     }
 

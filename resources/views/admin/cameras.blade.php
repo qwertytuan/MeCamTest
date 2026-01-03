@@ -641,6 +641,69 @@
         color: white;
     }
 
+    /* QR Code Styles */
+    .qr-btn {
+        padding: 0.75rem 1rem;
+        white-space: nowrap;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        color: var(--text-primary);
+    }
+
+    .qr-btn:hover {
+        background: var(--border);
+    }
+
+    .qr-modal-content {
+        max-width: 400px;
+        text-align: center;
+    }
+
+    .qr-code-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.5rem;
+    }
+
+    .qr-code-wrapper {
+        background: white;
+        padding: 1rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        margin-bottom: 1rem;
+    }
+
+    .qr-code-wrapper canvas,
+    .qr-code-wrapper img {
+        display: block;
+    }
+
+    .qr-code-label {
+        font-size: 0.9rem;
+        color: var(--text-secondary);
+        margin-bottom: 0.5rem;
+    }
+
+    .qr-code-url {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+        word-break: break-all;
+        padding: 0.75rem;
+        background: var(--bg-main);
+        border-radius: 6px;
+        margin-top: 1rem;
+        max-width: 100%;
+    }
+
+    .qr-actions {
+        display: flex;
+        gap: 0.5rem;
+        margin-top: 1rem;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
     /* Share button in action group */
     .icon-btn.share-btn {
         color: var(--accent);
@@ -1047,6 +1110,12 @@
                             </svg>
                             Copy
                         </button>
+                        <button type="button" class="btn qr-btn" onclick="showQRCode()" title="Show QR Code">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                            </svg>
+                            QR
+                        </button>
                     </div>
                     <div class="share-info-grid">
                         <div class="share-info-item">
@@ -1081,6 +1150,44 @@
                 </svg>
                 Generate Share Link
             </button>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div id="qrModal" class="modal" style="display: none;">
+    <div class="modal-content qr-modal-content">
+        <div class="modal-header">
+            <h2>
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 24px; height: 24px; vertical-align: middle; margin-right: 0.5rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                </svg>
+                QR Code
+            </h2>
+            <button class="modal-close" onclick="closeQRModal()">&times;</button>
+        </div>
+        <div class="modal-body">
+            <div class="qr-code-container">
+                <p class="qr-code-label">Scan to access camera stream</p>
+                <div class="qr-code-wrapper">
+                    <canvas id="qrCodeCanvas"></canvas>
+                </div>
+                <div class="qr-code-url" id="qrCodeUrl"></div>
+                <div class="qr-actions">
+                    <button type="button" class="btn btn-primary" onclick="downloadQRCode()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Download
+                    </button>
+                    <button type="button" class="btn btn-secondary" onclick="copyShareLink()">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                        </svg>
+                        Copy Link
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -2022,6 +2129,11 @@
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
                                         </svg>
                                     </button>
+                                    <button class="icon-btn" onclick="showTokenQRCode('${token.share_url}')" title="Show QR Code">
+                                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                        </svg>
+                                    </button>
                                     <button class="icon-btn" onclick="revokeToken(${cameraId}, ${token.id})" title="Revoke" style="color: var(--danger);">
                                         <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
                                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
@@ -2115,6 +2227,106 @@
             showAlert('Share link copied to clipboard!', 'success');
         });
     }
+
+    // QR Code Functions
+    function showQRCode(url = null) {
+        const shareUrl = url || document.getElementById('generatedUrl').value;
+        if (!shareUrl) {
+            showAlert('No share link available', 'error');
+            return;
+        }
+
+        // Display the URL
+        document.getElementById('qrCodeUrl').textContent = shareUrl;
+
+        // Generate QR Code using canvas
+        const canvas = document.getElementById('qrCodeCanvas');
+        generateQRCode(canvas, shareUrl);
+
+        // Show the modal
+        document.getElementById('qrModal').style.display = 'flex';
+    }
+
+    function closeQRModal() {
+        document.getElementById('qrModal').style.display = 'none';
+    }
+
+    function generateQRCode(canvas, text) {
+        const size = 200;
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+
+        // Use QRCode library if available, otherwise use a simple API
+        if (typeof QRCode !== 'undefined') {
+            QRCode.toCanvas(canvas, text, {
+                width: size,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#ffffff'
+                }
+            });
+        } else {
+            // Fallback: Use QR code API to generate image
+            const img = new Image();
+            img.crossOrigin = 'anonymous';
+            img.onload = function() {
+                ctx.drawImage(img, 0, 0, size, size);
+            };
+            img.onerror = function() {
+                // Draw placeholder if API fails
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, size, size);
+                ctx.fillStyle = '#666';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('QR Code', size/2, size/2 - 10);
+                ctx.fillText('Loading...', size/2, size/2 + 10);
+            };
+            img.src = `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(text)}`;
+        }
+    }
+
+    function downloadQRCode() {
+        const canvas = document.getElementById('qrCodeCanvas');
+        const shareUrl = document.getElementById('generatedUrl').value;
+
+        // Create a temporary canvas with white background and padding
+        const tempCanvas = document.createElement('canvas');
+        const padding = 20;
+        tempCanvas.width = canvas.width + (padding * 2);
+        tempCanvas.height = canvas.height + (padding * 2);
+        const tempCtx = tempCanvas.getContext('2d');
+
+        // Fill white background
+        tempCtx.fillStyle = '#ffffff';
+        tempCtx.fillRect(0, 0, tempCanvas.width, tempCanvas.height);
+
+        // Draw the QR code
+        tempCtx.drawImage(canvas, padding, padding);
+
+        // Create download link
+        const link = document.createElement('a');
+        link.download = 'camera-share-qr-code.png';
+        link.href = tempCanvas.toDataURL('image/png');
+        link.click();
+
+        showAlert('QR Code downloaded!', 'success');
+    }
+
+    // Show QR for existing token
+    function showTokenQRCode(url) {
+        document.getElementById('generatedUrl').value = url;
+        showQRCode(url);
+    }
+
+    // Close QR modal on outside click
+    document.getElementById('qrModal').addEventListener('click', (e) => {
+        if (e.target.id === 'qrModal') {
+            closeQRModal();
+        }
+    });
 
     async function revokeToken(cameraId, tokenId) {
         if (!confirm('Are you sure you want to revoke this share link? This cannot be undone.')) {
@@ -2240,6 +2452,11 @@
                                 <button class="icon-btn" onclick="copyTokenLink('${token.share_url}')" title="Copy Link">
                                     <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn" onclick="showTokenQRCode('${token.share_url}')" title="Show QR Code">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
                                     </svg>
                                 </button>
                                 <button class="icon-btn" onclick="revokeTokenFromDashboard(${token.camera_id}, ${token.id})" title="Revoke" style="color: var(--danger);">
