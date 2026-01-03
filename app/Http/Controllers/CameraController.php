@@ -666,6 +666,50 @@ class CameraController extends Controller
     }
 
     /**
+     * Get all share tokens across all cameras (for admin dashboard)
+     */
+    public function getAllShareTokens(): JsonResponse
+    {
+        $tokens = CameraShareToken::with('camera:id,name,location')
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->map(function ($token) {
+                return [
+                    'id' => $token->id,
+                    'token' => $token->token,
+                    'name' => $token->name,
+                    'camera_id' => $token->camera_id,
+                    'camera_name' => $token->camera->name ?? 'Unknown',
+                    'camera_location' => $token->camera->location ?? '',
+                    'share_url' => url("/share/camera/{$token->token}"),
+                    'watch_duration' => $token->watch_duration,
+                    'watch_duration_formatted' => $this->formatDuration($token->watch_duration),
+                    'max_views' => $token->max_views,
+                    'current_views' => $token->current_views,
+                    'expires_at' => $token->expires_at->toIso8601String(),
+                    'expires_at_formatted' => $token->expires_at->format('M d, Y h:i A'),
+                    'first_accessed_at' => $token->first_accessed_at?->toIso8601String(),
+                    'is_active' => $token->is_active,
+                    'is_valid' => $token->isValid(),
+                    'is_expired' => $token->expires_at->isPast(),
+                    'created_at' => $token->created_at->toIso8601String(),
+                    'created_at_formatted' => $token->created_at->format('M d, Y h:i A'),
+                ];
+            });
+
+        $activeTokens = $tokens->filter(fn($t) => $t['is_valid'])->values();
+        $inactiveTokens = $tokens->filter(fn($t) => !$t['is_valid'])->values();
+
+        return response()->json([
+            'success' => true,
+            'active_tokens' => $activeTokens,
+            'inactive_tokens' => $inactiveTokens,
+            'total_active' => $activeTokens->count(),
+            'total_inactive' => $inactiveTokens->count(),
+        ]);
+    }
+
+    /**
      * Revoke (deactivate) a share token
      */
     public function revokeShareToken(string $cameraId, string $tokenId): JsonResponse

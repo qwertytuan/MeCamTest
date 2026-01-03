@@ -357,6 +357,163 @@
         margin-bottom: 1rem;
     }
 
+    /* Share Tabs */
+    .share-tabs {
+        display: flex;
+        border-bottom: 2px solid var(--border);
+        margin-bottom: 1rem;
+    }
+
+    .share-tab {
+        padding: 0.75rem 1.5rem;
+        background: none;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        cursor: pointer;
+        position: relative;
+        transition: all 0.2s;
+    }
+
+    .share-tab:hover {
+        color: var(--text-primary);
+    }
+
+    .share-tab.active {
+        color: var(--accent);
+    }
+
+    .share-tab.active::after {
+        content: '';
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: var(--accent);
+    }
+
+    .share-tab-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 20px;
+        height: 20px;
+        padding: 0 6px;
+        background: var(--bg-main);
+        border-radius: 10px;
+        font-size: 0.75rem;
+        margin-left: 0.5rem;
+    }
+
+    .share-tab.active .share-tab-badge {
+        background: var(--accent);
+        color: white;
+    }
+
+    .share-tab-content {
+        display: none;
+    }
+
+    .share-tab-content.active {
+        display: block;
+    }
+
+    .share-tokens-grid {
+        display: grid;
+        gap: 0.75rem;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+
+    .share-token-card {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        background: var(--bg-main);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        transition: border-color 0.2s;
+    }
+
+    .share-token-card:hover {
+        border-color: var(--accent);
+    }
+
+    .share-token-card-info {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        flex: 1;
+    }
+
+    .share-token-camera-icon {
+        width: 40px;
+        height: 40px;
+        background: var(--accent);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .share-token-details h5 {
+        font-weight: 600;
+        color: var(--text-primary);
+        margin-bottom: 0.25rem;
+    }
+
+    .share-token-details p {
+        font-size: 0.8rem;
+        color: var(--text-secondary);
+    }
+
+    .share-token-meta {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .share-token-stat {
+        text-align: center;
+        padding: 0 0.75rem;
+        border-right: 1px solid var(--border);
+    }
+
+    .share-token-stat:last-of-type {
+        border-right: none;
+    }
+
+    .share-token-stat label {
+        display: block;
+        font-size: 0.7rem;
+        color: var(--text-secondary);
+        text-transform: uppercase;
+        margin-bottom: 0.125rem;
+    }
+
+    .share-token-stat span {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .share-empty-state {
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+    }
+
+    .share-empty-state svg {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 0.75rem;
+        opacity: 0.5;
+    }
+
     .share-access-placeholder {
         padding: 2rem;
         text-align: center;
@@ -757,12 +914,47 @@
             <span>Camera Stream Sharing</span>
         </h3>
         <p>Share camera streams with non-users for a limited time. Click the share button on any camera to generate a temporary viewing link.</p>
-        <div class="share-access-placeholder">
-            <div style="display: flex; flex-direction: column; align-items: center;">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px; color: var(--text-secondary); margin-bottom: 1rem;">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+
+        <!-- Tabs -->
+        <div class="share-tabs">
+            <button class="share-tab active" onclick="switchShareTab('active')" id="activeShareTab">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 0.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                 </svg>
-                <p style="color: var(--text-secondary); margin: 0;">Generate secure, time-limited share links for guests to view camera streams without requiring an account</p>
+                Active Links
+                <span class="share-tab-badge" id="activeShareCount">0</span>
+            </button>
+            <button class="share-tab" onclick="switchShareTab('inactive')" id="inactiveShareTab">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px; vertical-align: middle; margin-right: 0.25rem;">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
+                </svg>
+                Expired/Revoked
+                <span class="share-tab-badge" id="inactiveShareCount">0</span>
+            </button>
+        </div>
+
+        <!-- Active Share Links Tab Content -->
+        <div class="share-tab-content active" id="activeShareContent">
+            <div class="share-tokens-grid" id="activeShareTokensGrid">
+                <div class="share-empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"/>
+                    </svg>
+                    <p>No active share links</p>
+                    <small>Click the share button on any camera to create one</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- Inactive Share Links Tab Content -->
+        <div class="share-tab-content" id="inactiveShareContent">
+            <div class="share-tokens-grid" id="inactiveShareTokensGrid">
+                <div class="share-empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <p>No expired or revoked share links</p>
+                </div>
             </div>
         </div>
     </div>
@@ -1296,6 +1488,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
         loadCameras();
+        loadAllShareTokens();
     });
 
     async function loadCameras() {
@@ -1877,8 +2070,11 @@
                 document.getElementById('generatedLinkSection').style.display = 'block';
                 document.getElementById('generateShareBtn').style.display = 'none';
 
-                // Reload tokens list
+                // Reload tokens list in modal
                 loadShareTokens(cameraId);
+
+                // Reload the share tokens dashboard
+                loadAllShareTokens();
 
                 showAlert('Share link generated successfully!', 'success');
             } else {
@@ -1948,6 +2144,139 @@
             closeShareModal();
         }
     });
+
+    // =============================================
+    // SHARE TOKENS DASHBOARD FUNCTIONS
+    // =============================================
+
+    let allActiveShareTokens = [];
+    let allInactiveShareTokens = [];
+
+    async function loadAllShareTokens() {
+        try {
+            const { response, data } = await apiCall('/admin/share-tokens/all');
+
+            if (response.ok && data.success) {
+                allActiveShareTokens = data.active_tokens;
+                allInactiveShareTokens = data.inactive_tokens;
+
+                // Update counts
+                document.getElementById('activeShareCount').textContent = data.total_active;
+                document.getElementById('inactiveShareCount').textContent = data.total_inactive;
+
+                // Render the active tab by default
+                renderShareTokensGrid('active');
+            }
+        } catch (error) {
+            console.error('Error loading share tokens:', error);
+        }
+    }
+
+    function switchShareTab(tab) {
+        // Update tab buttons
+        document.getElementById('activeShareTab').classList.toggle('active', tab === 'active');
+        document.getElementById('inactiveShareTab').classList.toggle('active', tab === 'inactive');
+
+        // Update tab contents
+        document.getElementById('activeShareContent').classList.toggle('active', tab === 'active');
+        document.getElementById('inactiveShareContent').classList.toggle('active', tab === 'inactive');
+
+        // Render the appropriate grid
+        renderShareTokensGrid(tab);
+    }
+
+    function renderShareTokensGrid(tab) {
+        const tokens = tab === 'active' ? allActiveShareTokens : allInactiveShareTokens;
+        const gridId = tab === 'active' ? 'activeShareTokensGrid' : 'inactiveShareTokensGrid';
+        const container = document.getElementById(gridId);
+
+        if (tokens.length === 0) {
+            container.innerHTML = `
+                <div class="share-empty-state">
+                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="${tab === 'active' ? 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1' : 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'}"/>
+                    </svg>
+                    <p>${tab === 'active' ? 'No active share links' : 'No expired or revoked share links'}</p>
+                    ${tab === 'active' ? '<small>Click the share button on any camera to create one</small>' : ''}
+                </div>
+            `;
+            return;
+        }
+
+        container.innerHTML = tokens.map(token => {
+            const statusBadge = token.is_active
+                ? (token.is_expired ? '<span class="share-token-status expired">Expired</span>' : '<span class="share-token-status active">Active</span>')
+                : '<span class="share-token-status revoked">Revoked</span>';
+
+            return `
+                <div class="share-token-card">
+                    <div class="share-token-card-info">
+                        <div class="share-token-camera-icon">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 20px; height: 20px;">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                            </svg>
+                        </div>
+                        <div class="share-token-details">
+                            <h5>${token.name || token.camera_name}</h5>
+                            <p>${token.camera_location || 'No location'} • Created ${token.created_at_formatted}</p>
+                        </div>
+                    </div>
+                    <div class="share-token-meta">
+                        <div class="share-token-stat">
+                            <label>Duration</label>
+                            <span>${token.watch_duration_formatted}</span>
+                        </div>
+                        <div class="share-token-stat">
+                            <label>Views</label>
+                            <span>${token.current_views}${token.max_views ? '/' + token.max_views : ''}</span>
+                        </div>
+                        <div class="share-token-stat">
+                            <label>Expires</label>
+                            <span style="font-size: 0.75rem;">${token.expires_at_formatted}</span>
+                        </div>
+                        ${statusBadge}
+                        ${token.is_valid ? `
+                            <div class="access-actions">
+                                <button class="icon-btn" onclick="copyTokenLink('${token.share_url}')" title="Copy Link">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/>
+                                    </svg>
+                                </button>
+                                <button class="icon-btn" onclick="revokeTokenFromDashboard(${token.camera_id}, ${token.id})" title="Revoke" style="color: var(--danger);">
+                                    <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 16px; height: 16px;">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                                    </svg>
+                                </button>
+                            </div>
+                        ` : ''}
+                    </div>
+                </div>
+            `;
+        }).join('');
+    }
+
+    async function revokeTokenFromDashboard(cameraId, tokenId) {
+        if (!confirm('Are you sure you want to revoke this share link? This cannot be undone.')) {
+            return;
+        }
+
+        try {
+            const { response, data } = await apiCall(`/admin/cameras/${cameraId}/share-tokens/${tokenId}`, {
+                method: 'DELETE'
+            });
+
+            if (response.ok) {
+                showAlert('Share link revoked successfully', 'success');
+                // Reload all share tokens
+                await loadAllShareTokens();
+            } else {
+                showAlert(data.error || 'Failed to revoke share link', 'error');
+            }
+        } catch (error) {
+            console.error('Error revoking token:', error);
+            showAlert('Error revoking share link', 'error');
+        }
+    }
 
     // =============================================
     // USER ACCESS MANAGEMENT FUNCTIONS

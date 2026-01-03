@@ -84,6 +84,7 @@ Route::group([
      Route::post('/cameras/{id}/thumbnail/capture', [CameraController::class, 'captureThumbnail']);
 
      // Share token routes (admin only)
+     Route::get('/share-tokens/all', [CameraController::class, 'getAllShareTokens']);
      Route::post('/cameras/{id}/share', [CameraController::class, 'generateShareToken']);
      Route::get('/cameras/{id}/share-tokens', [CameraController::class, 'getShareTokens']);
      Route::delete('/cameras/{cameraId}/share-tokens/{tokenId}', [CameraController::class, 'revokeShareToken']);
