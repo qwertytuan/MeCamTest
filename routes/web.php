@@ -33,3 +33,7 @@ Route::get('/admin/cameras', static function () {
     return view('admin.cameras');
 })->name('admin.cameras');
 
+Route::get('/recordings', static function () {
+    return view('recordings.index');
+})->name('recordings');
+

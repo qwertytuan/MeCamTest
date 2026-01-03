@@ -335,6 +335,9 @@
                     <a href="{{ url('/dashboard') }}" class="${currentPath === '/dashboard' ? 'active' : ''}">
                         Cameras
                     </a>
+                    <a href="{{ url('/recordings') }}" class="${currentPath === '/recordings' ? 'active' : ''}">
+                        Recordings
+                    </a>
                     ${isAdmin ? `
                     <a href="{{ url('/admin/cameras') }}" class="${currentPath === '/admin/cameras' ? 'active' : ''}">
                         Manage Cameras
@@ -362,7 +365,7 @@
                 `;
 
                 // Only redirect to login if on protected page (not on public pages)
-                const protectedPages = ['/dashboard', '/profile', '/admin/cameras'];
+                const protectedPages = ['/dashboard', '/profile', '/admin/cameras', '/recordings'];
                 if (protectedPages.includes(currentPath) && !publicPages.includes(currentPath)) {
                     console.log('Redirecting to login - no valid token found');
                     window.location.href = '{{ url("/login") }}';

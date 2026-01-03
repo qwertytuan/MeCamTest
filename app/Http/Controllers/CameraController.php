@@ -465,15 +465,35 @@ class CameraController extends Controller
     {
         $camera = Camera::findOrFail($id);
 
+        // Check if user has access to this camera
+        $user = auth()->user();
+        if (!$user->is_admin && $camera->added_by !== $user->id) {
+            // Check if user has explicit camera access
+            $hasAccess = $camera->userAccess()
+                ->where('user_id', $user->id)
+                ->where('can_view', true)
+                ->exists();
+
+            if (!$hasAccess) {
+                return response()->json(['error' => 'Forbidden - You do not have access to this camera'], 403);
+            }
+        }
+
         try {
             $response = Http::timeout(10)->get("http://localhost:5000/api/recordings/{$id}");
 
             if ($response->successful()) {
                 $data = $response->json();
+                // Add camera info to recordings
+                $recordings = $data['recordings'] ?? [];
+                foreach ($recordings as &$recording) {
+                    $recording['camera_name'] = $camera->name;
+                    $recording['camera_location'] = $camera->location;
+                }
                 return response()->json([
                     'success' => true,
                     'camera_id' => $id,
-                    'recordings' => $data['recordings'] ?? []
+                    'recordings' => $recordings
                 ]);
             }
 
@@ -819,6 +839,180 @@ class CameraController extends Controller
                 $result .= " {$minutes} min";
             }
             return $result;
+        }
+    }
+
+    /**
+     * Download a recording file
+     * Proxies the request to Python backend
+     */
+    public function downloadRecording(string $cameraId, string $filename)
+    {
+        $camera = Camera::findOrFail($cameraId);
+
+        // Check if user has access to this camera
+        $user = auth()->user();
+        if (!$user->is_admin && $camera->added_by !== $user->id) {
+            // Check if user has explicit camera access
+            $hasAccess = $camera->userAccess()
+                ->where('user_id', $user->id)
+                ->where('can_view', true)
+                ->exists();
+
+            if (!$hasAccess) {
+                return response()->json(['error' => 'Forbidden - You do not have access to this recording'], 403);
+            }
+        }
+
+        try {
+            $response = Http::timeout(30)->get("http://localhost:5000/api/recording/{$cameraId}/{$filename}");
+
+            if ($response->successful()) {
+                return response($response->body(), 200)
+                    ->header('Content-Type', 'video/mp4')
+                    ->header('Content-Disposition', 'attachment; filename="' . $filename . '"')
+                    ->header('Content-Length', strlen($response->body()));
+            }
+
+            return response()->json(['error' => 'Recording not found'], 404);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Stream a recording file (for inline viewing)
+     * Proxies the request to Python backend
+     */
+    public function streamRecording(string $cameraId, string $filename)
+    {
+        $camera = Camera::findOrFail($cameraId);
+
+        // Check if user has access to this camera
+        $user = auth()->user();
+        if (!$user->is_admin && $camera->added_by !== $user->id) {
+            // Check if user has explicit camera access
+            $hasAccess = $camera->userAccess()
+                ->where('user_id', $user->id)
+                ->where('can_view', true)
+                ->exists();
+
+            if (!$hasAccess) {
+                return response()->json(['error' => 'Forbidden - You do not have access to this recording'], 403);
+            }
+        }
+
+        try {
+            $response = Http::timeout(30)->get("http://localhost:5000/api/recording/{$cameraId}/{$filename}");
+
+            if ($response->successful()) {
+                return response($response->body(), 200)
+                    ->header('Content-Type', 'video/mp4')
+                    ->header('Accept-Ranges', 'bytes')
+                    ->header('Content-Length', strlen($response->body()));
+            }
+
+            return response()->json(['error' => 'Recording not found'], 404);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Get all recordings for cameras the user has access to
+     */
+    public function getAllUserRecordings(): JsonResponse
+    {
+        $user = auth()->user();
+
+        try {
+            $allRecordings = [];
+
+            // Get cameras based on user role
+            if ($user->is_admin) {
+                // Admin sees all cameras
+                $cameras = Camera::all();
+            } else {
+                // Get cameras added by user + cameras with explicit access
+                $ownCameras = Camera::where('added_by', $user->id)->get();
+
+                $accessCameraIds = $user->cameraAccess()
+                    ->where('can_view', true)
+                    ->pluck('camera_id')
+                    ->toArray();
+
+                $accessCameras = Camera::whereIn('id', $accessCameraIds)->get();
+
+                $cameras = $ownCameras->merge($accessCameras)->unique('id');
+            }
+
+            foreach ($cameras as $camera) {
+                try {
+                    $response = Http::timeout(10)->get("http://localhost:5000/api/recordings/{$camera->id}");
+
+                    if ($response->successful()) {
+                        $data = $response->json();
+                        $recordings = $data['recordings'] ?? [];
+
+                        foreach ($recordings as &$recording) {
+                            $recording['camera_id'] = $camera->id;
+                            $recording['camera_name'] = $camera->name;
+                            $recording['camera_location'] = $camera->location;
+                        }
+
+                        $allRecordings = array_merge($allRecordings, $recordings);
+                    }
+                } catch (Exception $e) {
+                    // Continue with other cameras if one fails
+                    continue;
+                }
+            }
+
+            // Sort by created_at descending
+            usort($allRecordings, function ($a, $b) {
+                return ($b['created_at'] ?? 0) - ($a['created_at'] ?? 0);
+            });
+
+            return response()->json([
+                'success' => true,
+                'recordings' => $allRecordings,
+                'total' => count($allRecordings)
+            ]);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    /**
+     * Delete a recording
+     */
+    public function deleteRecording(string $cameraId, string $filename): JsonResponse
+    {
+        $camera = Camera::findOrFail($cameraId);
+
+        // Only admin or camera owner can delete recordings
+        $user = auth()->user();
+        if (!$user->is_admin && $camera->added_by !== $user->id) {
+            return response()->json(['error' => 'Forbidden - Only admin or camera owner can delete recordings'], 403);
+        }
+
+        try {
+            $response = Http::timeout(10)->delete("http://localhost:5000/api/recording/{$cameraId}/{$filename}");
+
+            if ($response->successful()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Recording deleted successfully'
+                ]);
+            }
+
+            return response()->json(['error' => 'Failed to delete recording'], 500);
+
+        } catch (Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 }

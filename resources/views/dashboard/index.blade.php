@@ -93,10 +93,60 @@
         width: 100%;
         height: 100%;
         object-fit: contain;
+        position: relative;
+        z-index: 2;
+    }
+
+    .camera-preview.streaming canvas {
+        z-index: 10;
     }
 
     .camera-preview.no-stream {
         background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+    }
+
+    .camera-thumbnail {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        transition: opacity 0.3s;
+        z-index: 1;
+    }
+
+    .camera-thumbnail.loaded {
+        opacity: 1;
+    }
+
+    .camera-preview.streaming .camera-thumbnail,
+    .camera-preview.streaming .camera-thumbnail-placeholder {
+        opacity: 0;
+        z-index: 0;
+    }
+
+    .camera-thumbnail-placeholder {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        color: #718096;
+        background: linear-gradient(135deg, #2d3748 0%, #1a202c 100%);
+        z-index: 1;
+    }
+
+    .camera-thumbnail-placeholder svg {
+        width: 48px;
+        height: 48px;
+        opacity: 0.5;
     }
 
     .camera-preview-placeholder {
@@ -128,6 +178,7 @@
         align-items: flex-start;
         justify-content: center;
         padding-top: 1rem;
+        z-index: 15;
     }
 
     .detection-alert-overlay.active {
@@ -179,6 +230,7 @@
         gap: 0.375rem;
         opacity: 0;
         transition: opacity 0.3s;
+        z-index: 16;
     }
 
     .recording-indicator.active {
@@ -204,6 +256,7 @@
         right: 0.75rem;
         display: flex;
         gap: 0.5rem;
+        z-index: 16;
     }
 
     .status-badge {
@@ -238,6 +291,7 @@
         gap: 0.5rem;
         opacity: 0;
         transition: opacity 0.3s;
+        z-index: 16;
     }
 
     .camera-preview:hover .camera-controls-toolbar {
@@ -991,6 +1045,30 @@
             <div class="camera-card" id="camera-card-${camera.id}">
                 <div class="camera-preview ${!camera.is_active ? 'no-stream' : ''}" onclick="openFullscreen(${camera.id})">
                     <canvas id="canvas-${camera.id}" width="640" height="480"></canvas>
+
+                    <!-- Thumbnail Image - shows when stream not active -->
+                    ${camera.thumbnail_url ? `
+                        <img id="thumbnail-${camera.id}"
+                             class="camera-thumbnail"
+                             src="${camera.thumbnail_url}"
+                             alt="${camera.name} thumbnail"
+                             onerror="this.style.display='none'; document.getElementById('thumbnail-placeholder-${camera.id}').style.display='flex';"
+                             onload="this.classList.add('loaded');">
+                        <div id="thumbnail-placeholder-${camera.id}" class="camera-thumbnail-placeholder" style="display: none;">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>No Preview</span>
+                        </div>
+                    ` : `
+                        <div id="thumbnail-placeholder-${camera.id}" class="camera-thumbnail-placeholder">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                            </svg>
+                            <span>No Preview</span>
+                        </div>
+                    `}
+
                     ${!camera.is_active ? `
                         <div class="camera-preview-placeholder">
                             <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" style="width: 48px; height: 48px;">
@@ -1208,6 +1286,12 @@
             `;
             button.classList.add('active');
 
+            // Add streaming class to preview
+            const preview = document.getElementById(`camera-card-${cameraId}`)?.querySelector('.camera-preview');
+            if (preview) {
+                preview.classList.add('streaming');
+            }
+
             // Show controls toolbar
             const controlsToolbar = document.getElementById(`controls-${cameraId}`);
             if (controlsToolbar) {
@@ -1246,6 +1330,12 @@
         if (canvas) {
             const ctx = canvas.getContext('2d');
             ctx.clearRect(0, 0, canvas.width, canvas.height);
+        }
+
+        // Remove streaming class from preview
+        const preview = document.getElementById(`camera-card-${cameraId}`)?.querySelector('.camera-preview');
+        if (preview) {
+            preview.classList.remove('streaming');
         }
 
         // Hide controls toolbar
@@ -1394,11 +1484,43 @@
                     URL.revokeObjectURL(url);
 
                     showToast('Frame captured and saved!', 'success');
+
+                    // Also save as thumbnail on server
+                    saveThumbnailToServer(cameraId);
                 }
             }, 'image/jpeg', 0.95);
         } catch (error) {
             console.error('Error capturing frame:', error);
             showToast('Failed to capture frame', 'error');
+        }
+    }
+
+    async function saveThumbnailToServer(cameraId) {
+        try {
+            const { response, data } = await apiCall(`/cameras/${cameraId}/thumbnail/capture`, {
+                method: 'POST'
+            });
+
+            if (response.ok && data.success) {
+                // Update the camera thumbnail in local cache
+                const camera = cameras.find(c => c.id === cameraId);
+                if (camera && data.thumbnail) {
+                    const thumbnailUrl = `${PYTHON_SERVER_URL}/api/thumbnail/${cameraId}/${data.thumbnail.file_name}`;
+                    camera.thumbnail_url = thumbnailUrl;
+
+                    // Update thumbnail image if exists
+                    const thumbnailImg = document.getElementById(`thumbnail-${cameraId}`);
+                    if (thumbnailImg) {
+                        thumbnailImg.src = thumbnailUrl;
+                        thumbnailImg.classList.remove('loaded');
+                        thumbnailImg.onload = () => thumbnailImg.classList.add('loaded');
+                    }
+
+                    showToast('Thumbnail saved to server', 'success');
+                }
+            }
+        } catch (error) {
+            console.error('Error saving thumbnail to server:', error);
         }
     }
 

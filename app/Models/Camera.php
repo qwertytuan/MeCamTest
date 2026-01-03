@@ -10,6 +10,7 @@ use Illuminate\Notifications\Notifiable;
 use App\Models\VideoRecording;
 use App\Models\ThumbnailImage;
 use App\Models\CameraShareToken;
+use App\Models\UserCameraAccess;
 
 class Camera extends Model
 {
@@ -75,5 +76,10 @@ class Camera extends Model
     public function activeShareTokens(): HasMany
     {
         return $this->hasMany(CameraShareToken::class)->where('is_active', true)->where('expires_at', '>', now());
+    }
+
+    public function userAccess(): HasMany
+    {
+        return $this->hasMany(UserCameraAccess::class);
     }
 }

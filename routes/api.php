@@ -20,6 +20,12 @@ Route::group([
     'prefix' => 'cameras'
 ], function ($router) {
     Route::get('/', [CameraController::class, 'getUserCameras']);
+
+    // User recordings routes
+    Route::get('/recordings', [CameraController::class, 'getAllUserRecordings']);
+    Route::get('/{id}/recordings', [CameraController::class, 'getRecordings']);
+    Route::get('/{cameraId}/recordings/{filename}/download', [CameraController::class, 'downloadRecording']);
+    Route::get('/{cameraId}/recordings/{filename}/stream', [CameraController::class, 'streamRecording']);
 });
 
 Route::group([
@@ -78,6 +84,7 @@ Route::group([
 
      // Recording routes
      Route::get('/cameras/{id}/recordings', [CameraController::class, 'getRecordings']);
+     Route::delete('/cameras/{cameraId}/recordings/{filename}', [CameraController::class, 'deleteRecording']);
 
      // Thumbnail routes
      Route::get('/cameras/{id}/thumbnails', [CameraController::class, 'getThumbnails']);
